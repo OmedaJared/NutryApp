@@ -1,78 +1,144 @@
 <!DOCTYPE html>
-<html lang="es-mx">
+<html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NutriApp</title>
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
-        crossorigin="anonymous"
-    />
+    <meta charset="UTF-8">
+    <title>NutriApp - Control Nutricional</title>
+
+    <style>
+
+        :root{
+            --verde-oscuro: #145a32;
+            --verde: #1e8449;
+            --verde-claro: #dff6e9;
+            --fondo: #f0fff4;
+            --texto: #163f2a;
+            --blanco: #ffffff;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--fondo);
+            color: var(--texto);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        header {
+            padding: 18px 20px;
+        }
+
+        header h1 {
+            color: var(--verde);
+            margin: 0 0 6px 0;
+            font-size: 28px;
+        }
+
+        header p {
+            color: var(--verde-oscuro);
+            margin: 0 0 8px 0;
+        }
+
+        main {
+            padding: 18px 20px;
+        }
+
+        section {
+            background: var(--blanco);
+            border: 1px solid var(--verde-claro);
+            padding: 14px;
+            border-radius: 8px;
+            box-sizing: border-box;
+            max-width: 760px;
+        }
+
+        table {
+            background: var(--blanco);
+            border-collapse: collapse;
+        }
+
+        label {
+            color: var(--verde-oscuro);
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            border: 1px solid #cfe8da;
+            padding: 8px;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 6px;
+            margin-bottom: 12px;
+        }
+
+        button {
+            background-color: var(--verde);
+            color: #fff;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        button:hover {
+            background-color: var(--verde-oscuro);
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--verde-claro), transparent);
+            margin: 16px 0;
+        }
+
+        section + hr + section p strong,
+        section + hr + section p {
+            color: var(--verde-oscuro);
+        }
+
+        footer {
+            padding: 12px 20px;
+            margin-top: 18px;
+        }
+
+        footer p {
+            color: var(--verde-oscuro);
+            margin: 6px 0;
+            font-size: 14px;
+        }
+
+
+        .error {
+            color: #b00020;
+            font-weight: 700;
+        }
+
+
+        @media (max-width: 600px) {
+            section {
+                padding: 12px;
+            }
+        }
+    </style>
 </head>
-
 <body>
-    <div class="container text-center bg-success ">
-    <h1>NutriApp</h1>
-    </div>
+    <header>
+        <h1>🍎 NutriApp</h1>
+        <p>Aplicación de control nutricional</p>
+        <hr>
+    </header>
 
-<div class="container text-center bg-secondary">
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Navbar</a>
-        <button
-            class="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNavDropdown"
-        aria-controls="navbarNavDropdown"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-        >
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavDropdown">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Features</a>
-            </li>
-            <li class="nav-item">
-            <a class="nav-link" href="#">Pricing</a>
-            </li>
-            <li class="nav-item dropdown">
-            <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-            >
-                Dropdown link
-            </a>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">Action</a></li>
-                <li><a class="dropdown-item" href="#">Another action</a></li>
-                <li>
-                    <a class="dropdown-item" href="#">Something else here</a>
-                </li>
-            </ul>
-            </li>
-        </ul>
-        </div>
-    </div>
-    </nav>
-</div>
+    <main>
+        {% block contenido %}{% endblock %}
+    </main>
 
-
-
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"
-    ></script>
+    <footer>
+        <hr>
+        <p>Proyecto escolar realizado por: <strong>Jared Olmeda</strong></p>
+        <p>3° de preparatoria - 2025</p>
+    </footer>
 </body>
 </html>

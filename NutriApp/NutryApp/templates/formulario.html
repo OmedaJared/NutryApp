@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block contenido %}
+<section>
+    <h2>Registro de datos personales</h2>
+    <p>Ingresa tus datos para calcular tu IMC (Índice de Masa Corporal) y tus calorías diarias aproximadas.</p>
+
+    {% if error %}
+        <p class="error"><strong>{{ error }}</strong></p>
+    {% endif %}
+
+    <table cellpadding="10" cellspacing="0" bgcolor="#ffffff" border="0">
+    <tr><td>
+    <form action="/resultado" method="post">
+        <label>Nombre:</label><br>
+        <input type="text" name="nombre" value="{{ nombre or '' }}" required><br><br>
+
+        <label>Edad (años):</label><br>
+        <input type="number" name="edad" min="1" value="{{ edad or '' }}" required><br><br>
+
+        <label>Peso (kg):</label><br>
+        <input type="number" step="0.1" name="peso" value="{{ peso or '' }}" required><br><br>
+
+        <label>Altura (m):</label><br>
+        <input type="number" step="0.01" name="altura" value="{{ altura or '' }}" required><br><br>
+
+        <label>Género:</label><br>
+        <select name="genero" required>
+            <option value="masculino" {% if genero == 'masculino' %}selected{% endif %}>Masculino</option>
+            <option value="femenino" {% if genero == 'femenino' %}selected{% endif %}>Femenino</option>
+        </select><br><br>
+
+        <button type="submit">Calcular resultados</button>
+    </form>
+    </td></tr>
+    </table>
+</section>
+
+{% if imc %}
+<hr>
+<section>
+    <h2>Resultados nutricionales</h2>
+    <p><strong>Nombre:</strong> {{ nombre }}</p>
+    <p><strong>Edad:</strong> {{ edad }} años</p>
+    <p><strong>Peso:</strong> {{ peso }} kg</p>
+    <p><strong>Altura:</strong> {{ altura }} m</p>
+    <p><strong>Género:</strong> {{ genero }}</p>
+    <hr>
+    <p><strong>IMC:</strong> {{ imc }}</p>
+    <p><strong>Clasificación:</strong> {{ clasificacion }}</p>
+    <p><strong>Recomendación:</strong> {{ recomendacion }}</p>
+    <p><strong>Calorías diarias estimadas:</strong> {{ calorias }} kcal</p>
+</section>
+{% endif %}
+{% endblock %}
