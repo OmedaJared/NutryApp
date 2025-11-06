@@ -10,9 +10,12 @@ def inicio():
 def resultado():
 
     nombre = request.form.get('nombre', '').strip()
+    apellido= request.form.get('apellido', '').strip()
     edad_raw = request.form.get('edad', '')
     peso_raw = request.form.get('peso', '')
     altura_raw = request.form.get('altura', '')
+    contraseña= request.form.get('contraseña', '')
+    correo_electronico = request.form.get('correo electronico', '')
     genero = request.form.get('genero', 'masculino') 
 
     
@@ -49,9 +52,12 @@ def resultado():
     return render_template(
         'formulario.html',
         nombre=nombre,
+        apellido=apellido,
         edad=edad,
         peso=peso,
         altura=altura,
+        correo_electronico=correo_electronico,
+        contraseña=contraseña,
         genero=genero,
         imc=round(imc, 2),
         clasificacion=clasificacion,
