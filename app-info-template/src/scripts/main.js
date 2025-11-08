@@ -1,4 +1,3 @@
-// main.js
 document.addEventListener('DOMContentLoaded', function() {
     const appInfo = {
         title: "Aplicación de Ejemplo",
@@ -12,8 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const introSection = document.createElement('div');
-    introSection.style.color = 'black'; // Color del texto
-    introSection.style.backgroundColor = 'lightgray'; // Color de fondo
+    introSection.style.color = 'black';
+    introSection.style.backgroundColor = 'lightgray';
 
     const titleElement = document.createElement('h1');
     titleElement.textContent = appInfo.title;

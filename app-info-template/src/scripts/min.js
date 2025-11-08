@@ -1,4 +1,3 @@
-// setBgColor guarda la elección en localStorage y actualiza la variable CSS --bg
 function setBgColor(color) {
     document.documentElement.style.setProperty('--bg', color);
     try { localStorage.setItem('app_bg_color', color); } catch (e) { /* noop */ }
