@@ -1,0 +1,15 @@
+:root{
+    --bg: #1edc50; /* valor por defecto (claro) */
+    --primary: #24c429;
+    --accent: #17d120;
+    --muted: #25ba57;
+}
+
+html, body {
+    height: 100%;
+    background-color: var(--bg);
+}
+
+.brand { color: var(--primary); }
+.accent { color: var(--accent); }
+.muted { color: var(--muted); font-size: 0.9em; }

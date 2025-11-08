@@ -1,0 +1,22 @@
+{
+  "name": "app-info-template",
+  "version": "1.0.0",
+  "description": "A simple application that provides information about its purpose, features, and usage.",
+  "main": "src/scripts/main.js",
+  "scripts": {
+    "start": "live-server public",
+    "build": "echo 'Build step not defined'",
+    "test": "echo 'No tests defined'"
+  },
+  "keywords": [
+    "information",
+    "template",
+    "application"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}
