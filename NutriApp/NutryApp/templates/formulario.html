@@ -39,7 +39,22 @@
             <option value="femenino" {% if genero == 'femenino' %}selected{% endif %}>Femenino</option>
         </select><br><br>
 
-        <button type="submit">Calcular resultados</button>
+        <label>Nivel De Actividad Fisica</label><br>
+        <select name="actividad" required>
+            <option value="Principiante" {% if actividad == 'Principiante' %}selected{% endif %}>Principiante</option>
+            <option value="Avanzado" {% if actividad == 'Avanzado' %}selected{% endif %}>Avanzado</option>
+            <option value="Experimentado" {% if actividad == 'Experimentado' %}selected{% endif %}>Experimentado</option>
+            <option value="Experto" {% if actividad == 'Experto' %}selected{% endif %}>Experto</option>
+        </select><br><br>
+
+        <label>Ojetivos</label><br>
+        <select name="obje" required>
+            <option value="¿Bajar de peso?" {% if obje == '¿Bajar de peso?' %}selected{% endif %}>¿Bajar de peso?</option>
+            <option value="¿Aumentar masa muscular?" {% if obje == '¿Aumentar masa muscular?' %}selected{% endif %}>¿Aumentar masa muscular?</option>
+            <option value=" ¿Mantener peso?" {% if obje == ' ¿Mantener peso?' %}selected{% endif %}> ¿Mantener peso?</option>
+            <option value="¿Mejorar digestión?" {% if obje == '¿Mejorar digestión?' %}selected{% endif %}>¿Mejorar digestión?</option>
+            <option value="¿Controlar una condición (diabetes, hipertensión)?" {% if obje == '¿Controlar una condición (diabetes, hipertensión)?' %}selected{% endif %}>¿Controlar una condición (diabetes, hipertensión)?</option>
+        <button type="submit">Iniciar Sesion</button>
     </form>
     </td></tr>
     </table>
