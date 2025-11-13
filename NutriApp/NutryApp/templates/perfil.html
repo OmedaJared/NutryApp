@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mi Perfil</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/colors.css') }}">
+</head>
+<body>
+    <div class="container-card">
+        <div class="card-soft">
+            <h2 class="brand">Información ingresada</h2>
+            <p><strong>Nombre:</strong> {{ user.nombre }} {{ user.apellido }}</p>
+            <p><strong>Edad:</strong> {{ user.edad }}</p>
+            <p><strong>Peso:</strong> {{ user.peso }} kg</p>
+            <p><strong>Altura:</strong> {{ user.altura }} m</p>
+            <p><strong>Género:</strong> {{ user.genero }}</p>
+            <p><strong>Correo:</strong> {{ user.correo_electronico }}</p>
+            <p><strong>IMC:</strong> {{ user.imc }}</p>
+            <p><strong>Clasificación:</strong> {{ user.clasificacion }}</p>
+            <p><strong>Calorías mantenimiento:</strong> {{ user.calorias }} kcal</p>
+
+            <nav style="margin-top:15px;">
+                <a class="btn-brand" href="{{ url_for('rutina') }}">Volver a rutina</a>
+                <a class="btn-brand" href="{{ url_for('logout') }}" style="margin-left:10px;">Cerrar sesión</a>
+            </nav>
+        </div>
+    </div>
+</body>
+</html>

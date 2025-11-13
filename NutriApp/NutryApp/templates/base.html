@@ -1,138 +1,24 @@
-<!DOCTYPE html>
-<html lang="es-mx">
-    <head>
-    <meta charset="UTF-8" />
-    <title>NutriApp - Control Nutricional</title>
-
-    <style>
-    :root {
-        --verde-oscuro: #145a32;
-        --verde: #1e8449;
-        --verde-claro: rgba(0, 66, 3, 1);
-        --fondo: rgba(153, 247, 178, 1);
-        --texto: #163f2a;
-        --blanco: rgb(116, 221, 116);
-    }
-
-    html,body {
-        margin: 0;
-        padding: 0;
-        background-color: var(--fondo);
-        color: var(--texto);
-        font-family: Arial, Helvetica, sans-serif;
-    }
-
-    header {
-        padding: 18px 20px;
-    }
-
-    header h1 {
-        color: var(--verde);
-        margin: 0 0 6px 0;
-        font-size: 28px;
-    }
-
-    header p {
-        color: var(--verde-oscuro);
-        margin: 0 0 8px 0;
-    }
-
-    main {
-        padding: 18px 20px;
-    }
-
-    section {
-        background: var(--blanco);
-        border: 1px solid var(--verde-claro);
-        padding: 14px;
-        border-radius: 8px;
-        box-sizing: border-box;
-        max-width: 760px;
-    }
-
-    table {
-        background: var(--blanco);
-        border-collapse: collapse;
-    }
-
-    label {
-        color: var(--verde-oscuro);
-        font-weight: 600;
-    }
-
-    input[type="text"],
-    input[type="number"],
-    select {
-        border: 1px solid #000000ff;
-        padding: 8px;
-        border-radius: 4px;
-        width: 100%;
-        box-sizing: border-box;
-        margin-top: 6px;
-        margin-bottom: 12px;
-    }
-
-    button {
-        background-color: var(--verde);
-        color: #ffffffff;
-        border: none;
-        padding: 10px 14px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 700;
-    }
-
-        button:hover {
-        background-color: var(--verde-oscuro);
-    }
-
-    hr {
-        border: 0;
-        height: 1px;
-        background: linear-gradient(to right,transparent,var(--verde-claro),transparent);
-        margin: 16px 0;
-    }
-
-        section + hr + section p strong,
-        section + hr + section p {
-        color: var(--verde-oscuro);
-    }
-
-    footer {
-        padding: 12px 20px;
-        margin-top: 18px;
-    }
-
-    footer p {
-        color: var(--verde-oscuro);
-        margin: 6px 0;
-        font-size: 14px;
-    }
-
-    .error {
-        color: #b00020;
-        font-weight: 700;
-    }
-
-    @media (max-width: 600px) {
-        section {
-            padding: 12px;
-        }
-        }
-    </style>
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}NutriApp{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/colors.css') }}">
 </head>
 <body>
-    <header>
-        <h1>🍎 NutriApp</h1>
-        <p>Aplicación de control nutricional</p>
-        <hr />
+    <header style="padding:16px;">
+        <a href="{{ url_for('inicio') }}" class="brand">NutriApp</a>
     </header>
-    <main>{% block contenido %}{% endblock %}</main>
 
-    <footer>
-        <hr />
-        <p>Proyecto escolar realizado por: <strong>Jared Olmeda</strong></p>
-        <p>3° de preparatoria - 2025</p>
+    <main>
+        <div class="container-card">
+            {% block contenido %}{% endblock %}
+        </div>
+    </main>
+
+    <footer style="padding:16px; text-align:center;">
+        <p class="muted">Aplicación orientativa — no sustituye consejo profesional</p>
     </footer>
 </body>
 </html>

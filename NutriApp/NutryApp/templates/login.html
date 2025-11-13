@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Iniciar sesión</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/colors.css') }}">
+</head>
+<body>
+    <div class="container-card">
+        <div class="card-soft">
+            <h2 class="brand">Iniciar sesión</h2>
+            <p class="accent">Usa el correo y contraseña que registraste en el formulario.</p>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for m in messages %}
+                  <p class="error">{{ m }}</p>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <!-- Al enviar, va directamente a /rutina -->
+            <form action="{{ url_for('rutina') }}" method="get">
+                <label>Correo Electrónico:</label><br>
+                <input class="form-control" type="email" name="correo" required><br>
+
+                <label>Contraseña:</label><br>
+                <input class="form-control" type="password" name="contraseña" required><br>
+
+                <button class="btn-brand" type="submit">Entrar</button>
+                <a class="btn-brand" href="{{ url_for('formulario') }}" style="margin-left:10px; text-decoration:none;">Volver al formulario</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+```// filepath: c:\Users\User\OneDrive\Desktop\Nueva carpeta (8)\nutriapp\templates\login.html
+<!-- ...existing code... -->
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Iniciar sesión</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/colors.css') }}">
+</head>
+<body>
+    <div class="container-card">
+        <div class="card-soft">
+            <h2 class="brand">Iniciar sesión</h2>
+            <p class="accent">Usa el correo y contraseña que registraste en el formulario.</p>
+
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                {% for m in messages %}
+                  <p class="error">{{ m }}</p>
+                {% endfor %}
+              {% endif %}
+            {% endwith %}
+
+            <!-- Al enviar, va directamente a /rutina -->
+            <form action="{{ url_for('rutina') }}" method="get">
+                <label>Correo Electrónico:</label><br>
+                <input class="form-control" type="email" name="correo" required><br>
+
+                <label>Contraseña:</label><br>
+                <input class="form-control" type="password" name="contraseña" required><br>
+
+                <button class="btn-brand" type="submit">Entrar</button>
+                <a class="btn-brand" href="{{ url_for('formulario') }}" style="margin-left:10px; text-decoration:none;">Volver al formulario</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

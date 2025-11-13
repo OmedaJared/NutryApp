@@ -1,15 +1,39 @@
-:root{
-    --bg: #1edc50;
+:root {
+    --bg: #1edc50; 
     --primary: #24c429;
     --accent: #17d120;
     --muted: #25ba57;
+    --texto: #0b2e10;
 }
 
+/* ...existing code... */
 html, body {
     height: 100%;
     background-color: var(--bg);
+    color: var(--texto);
 }
 
 .brand { color: var(--primary); }
 .accent { color: var(--accent); }
 .muted { color: var(--muted); font-size: 0.9em; }
+
+/* Simple card / form styling to match palette */
+.container-card {
+    max-width: 900px;
+    margin: 20px auto;
+}
+.card-soft {
+    background: rgba(255,255,255,0.9);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    color: var(--texto);
+}
+.btn-brand {
+    background-color: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+}
+.error { color: #b00; font-weight: bold; }
