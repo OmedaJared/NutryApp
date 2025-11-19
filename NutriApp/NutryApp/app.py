@@ -27,7 +27,6 @@ def inicio():
 @app.route('/formulario')
 def formulario():
     """Page that contains the form for user input."""
-    # Prefill with session data if available
     user = session.get('user', {})
     return render_template('formulario.html', **user)
 
@@ -84,7 +83,6 @@ def resultado():
 
     calorias_mantenimiento = round(tmb * 1.55, 2)
 
-    # Guardar datos relevantes en sesión para login y uso posterior
     session['user'] = {
         'nombre': nombre,
         'apellido': apellido,
@@ -133,7 +131,6 @@ def login():
     flash('Correo o contraseña incorrectos.')
     return render_template('login.html')
 
-# ...existing code...
 @app.route('/rutina')
 def rutina():
     """Muestra rutina y plan basado en los datos guardados.
@@ -145,11 +142,10 @@ def rutina():
     if not user:
         flash('Completa el formulario o inicia sesión para ver tu rutina.')
         return redirect(url_for('formulario'))
-    # Auto-autenticar si hay datos en sesión para permitir acceso directo
+
     if not session.get('authenticated'):
         session['authenticated'] = True
     return render_template('rutina.html', user=user)
-# ...existing code...
 
 @app.route('/perfil')
 def perfil():
@@ -164,7 +160,7 @@ def perfil():
 def logout():
     """Cerrar sesión y regresar al inicio."""
     session.pop('authenticated', None)
-    # conservar user? limpiar todo por seguridad
+
     session.pop('user', None)
     flash('Sesión cerrada.')
     return redirect(url_for('inicio'))
