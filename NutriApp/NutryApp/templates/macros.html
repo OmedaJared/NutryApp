@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Macronutrientes - NutriApp{% endblock %}
+
+{% block contenido %}
+<div class="card-soft">
+    <h2 class="brand">Calculadora de Macronutrientes</h2>
+    <p class="accent">Divide tus calorías diarias en macros.</p>
+
+    <form action="{{ url_for('macros') }}" method="post">
+        <label>Calorías diarias:</label>
+        <input class="form-control" type="number" name="calorias" required><br>
+
+        <label>Proteínas (%):</label>
+        <input class="form-control" type="number" name="p" value="30"><br>
+
+        <label>Carbohidratos (%):</label>
+        <input class="form-control" type="number" name="c" value="40"><br>
+
+        <label>Grasas (%):</label>
+        <input class="form-control" type="number" name="g" value="30"><br>
+
+        <button class="btn-brand" type="submit">Calcular Macros</button>
+    </form>
+
+    {% if macros %}
+    <hr>
+    <h3 class="brand">Resultado en gramos:</h3>
+    <p><strong>Proteína:</strong> {{ macros.prot }} g</p>
+    <p><strong>Carbohidratos:</strong> {{ macros.carb }} g</p>
+    <p><strong>Grasas:</strong> {{ macros.fat }} g</p>
+    {% endif %}
+</div>
+{% endblock %}

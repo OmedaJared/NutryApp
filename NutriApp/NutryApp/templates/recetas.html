@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Analizador de Recetas - NutriApp{% endblock %}
+
+{% block contenido %}
+<div class="card-soft">
+    <h2 class="brand">Analizador de Recetas</h2>
+    <p class="accent">Ingresa alimentos y sus calorías por porción.</p>
+
+    <form action="{{ url_for('recetas') }}" method="post">
+        <label>Lista de ingredientes (uno por línea):</label>
+        <textarea class="form-control" name="ingredientes" rows="6" placeholder="Ejemplo:
+Arroz 200 kcal
+Pollo 250 kcal
+Aceite 120 kcal"></textarea><br>
+
+        <button class="btn-brand" type="submit">Analizar</button>
+    </form>
+
+    {% if total %}
+    <hr>
+    <h3 class="brand">Resultado:</h3>
+    <p><strong>Calorías totales:</strong> {{ total }} kcal</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}GCT - NutriApp{% endblock %}
+
+{% block contenido %}
+<div class="card-soft">
+    <h2 class="brand">Calculadora de Gasto Calórico Total (GCT)</h2>
+    <p class="accent">Calcula tu gasto total según tu actividad diaria.</p>
+
+    <form action="{{ url_for('gct') }}" method="post">
+        <label>TMB (kcal):</label>
+        <input class="form-control" type="number" name="tmb" step="0.1" required><br>
+
+        <label>Nivel de actividad:</label>
+        <select class="form-control" name="actividad">
+            <option value="1.2">Sedentario</option>
+            <option value="1.375">Ligero</option>
+            <option value="1.55">Moderado</option>
+            <option value="1.725">Intenso</option>
+            <option value="1.9">Muy intenso</option>
+        </select><br>
+
+        <button class="btn-brand" type="submit">Calcular GCT</button>
+    </form>
+
+    {% if gct %}
+    <hr>
+    <h3 class="brand">Resultado:</h3>
+    <p><strong>Gasto Calórico Total:</strong> {{ gct }} kcal/día</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}TMB - NutriApp{% endblock %}
+
+{% block contenido %}
+<div class="card-soft">
+    <h2 class="brand">Calculadora de Tasa Metabólica Basal (TMB)</h2>
+    <p class="accent">Ingresa tus datos para estimar tu metabolismo basal.</p>
+
+    {% if error %}
+        <p class="error"><strong>{{ error }}</strong></p>
+    {% endif %}
+
+    <form action="{{ url_for('tmb') }}" method="post">
+        <label>Peso (kg):</label>
+        <input class="form-control" type="number" step="0.1" name="peso" value="{{ peso or '' }}" required><br>
+
+        <label>Altura (cm):</label>
+        <input class="form-control" type="number" step="0.1" name="altura" value="{{ altura or '' }}" required><br>
+
+        <label>Edad:</label>
+        <input class="form-control" type="number" name="edad" value="{{ edad or '' }}" required><br>
+
+        <label>Género:</label>
+        <select class="form-control" name="genero">
+            <option value="masculino">Masculino</option>
+            <option value="femenino">Femenino</option>
+        </select><br>
+
+        <button class="btn-brand" type="submit">Calcular TMB</button>
+    </form>
+
+    {% if tmb %}
+    <hr>
+    <h3 class="brand">Resultado:</h3>
+    <p><strong>TMB:</strong> {{ tmb }} kcal/día</p>
+    {% endif %}
+</div>
+{% endblock %}
