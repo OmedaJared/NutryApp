@@ -147,6 +147,27 @@ def rutina():
         session['authenticated'] = True
     return render_template('rutina.html', user=user)
 
+@app.route("/tmb", methods=["GET", "POST"])
+def tmb():
+    if request.method == "POST":
+        try:
+            peso = float(request.form["peso"])
+            altura = float(request.form["altura"])
+            edad = int(request.form["edad"])
+            genero = request.form["genero"]
+
+            if genero == "masculino":
+                tmb = 88.36 + 13.4 * peso + 4.8 * altura - 5.7 * edad
+            else:
+                tmb = 447.6 + 9.2 * peso + 3.1 * altura - 4.3 * edad
+
+            return render_template("tmb.html", tmb=round(tmb, 2), peso=peso,
+                                altura=altura, edad=edad, genero=genero)
+        except:
+            return render_template("tmb.html", error="Datos inválidos")
+
+    return render_template("tmb.html")
+
 @app.route('/perfil')
 def perfil():
     """Muestra toda la información del usuario y botón para cerrar sesión."""
@@ -156,6 +177,15 @@ def perfil():
     user = session.get('user', {})
     return render_template('perfil.html', user=user)
 
+@app.route("/gct", methods=["GET", "POST"])
+def gct():
+    if request.method == "POST":
+        tmb = float(request.form["tmb"])
+        actividad = float(request.form["actividad"])
+        gct = tmb * actividad
+        return render_template("gct.html", gct=round(gct, 1))
+    return render_template("gct.html")
+
 @app.route('/logout')
 def logout():
     """Cerrar sesión y regresar al inicio."""
@@ -164,6 +194,62 @@ def logout():
     session.pop('user', None)
     flash('Sesión cerrada.')
     return redirect(url_for('inicio'))
+
+@app.route("/peso_ideal", methods=["GET", "POST"])
+def peso_ideal():
+    if request.method == "POST":
+        altura = float(request.form["altura"])
+        genero = request.form["genero"]
+
+        base = altura - 152.4
+
+        if genero == "masculino":
+            ideal = 50 + 0.9 * base
+        else:
+            ideal = 45.5 + 0.9 * base
+
+        return render_template("peso_ideal.html", ideal=round(ideal, 1))
+
+    return render_template("peso_ideal.html")
+
+@app.route("/macros", methods=["GET", "POST"])
+def macros():
+    if request.method == "POST":
+        calorias = float(request.form["calorias"])
+        p = float(request.form["p"])
+        c = float(request.form["c"])
+        g = float(request.form["g"])
+
+        kcal_p = calorias * p / 100
+        kcal_c = calorias * c / 100
+        kcal_g = calorias * g / 100
+
+        resultado = {
+            "prot": round(kcal_p / 4, 1),
+            "carb": round(kcal_c / 4, 1),
+            "fat": round(kcal_g / 9, 1)
+        }
+
+        return render_template("macros.html", macros=resultado)
+
+    return render_template("macros.html")
+
+@app.route("/recetas", methods=["GET", "POST"])
+def recetas():
+    if request.method == "POST":
+        texto = request.form["ingredientes"].strip().split("\n")
+
+        total = 0
+        for l in texto:
+            try:
+                kcal = float(l.split()[-2]) if "kcal" in l else float(l.split()[-1])
+                total += kcal
+            except:
+                pass
+
+        return render_template("recetas.html", total=round(total, 1))
+
+    return render_template("recetas.html")
 
 if __name__ == '__main__':
     app.run(debug=True)
