@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ receta.title }} - NutriApp{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card-soft">
+            <h2 class="brand">{{ receta.title }}</h2>
+            <p class="accent">{{ receta.description }}</p>
+
+            <h5 class="mt-3">Ingredientes</h5>
+            <ul>
+                {% for ing in receta.ingredients %}
+                    <li>{{ ing }}</li>
+                {% endfor %}
+            </ul>
+
+            <h5 class="mt-3">Preparación</h5>
+            <ol>
+                {% for step in receta.steps %}
+                    <li>{{ step }}</li>
+                {% endfor %}
+            </ol>
+
+            <a class="btn btn-outline-primary mt-3" href="{{ url_for('recetas') }}">Volver a recetas</a>
+            <a class="btn btn-success mt-3" href="{{ url_for('rutina') }}" style="margin-left:8px;">Volver a rutina</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

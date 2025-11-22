@@ -1,13 +1,9 @@
-<!doctype html>
-<html lang="es">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Mi Perfil</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/colors.css') }}">
-</head>
-<body>
-    <div class="container-card">
+{% extends "base.html" %}
+{% block title %}Mi Perfil - NutriApp{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
         <div class="card-soft">
             <h2 class="brand">Información ingresada</h2>
             <p><strong>Nombre:</strong> {{ user.nombre }} {{ user.apellido }}</p>
@@ -21,10 +17,11 @@
             <p><strong>Calorías mantenimiento:</strong> {{ user.calorias }} kcal</p>
 
             <nav style="margin-top:15px;">
-                <a class="btn-brand" href="{{ url_for('rutina') }}">Volver a rutina</a>
-                <a class="btn-brand" href="{{ url_for('logout') }}" style="margin-left:10px;">Cerrar sesión</a>
+                <a class="btn-brand" href="{{ url_for('rutina') }}">Ver rutina detallada</a>
+                <a class="btn btn-outline-secondary" href="{{ url_for('recetas') }}" style="margin-left:10px;">Recetas</a>
+                <a class="btn btn-danger" href="{{ url_for('logout') }}" style="margin-left:10px;">Cerrar sesión</a>
             </nav>
         </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

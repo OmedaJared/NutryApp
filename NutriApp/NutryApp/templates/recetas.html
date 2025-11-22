@@ -1,25 +1,24 @@
 {% extends "base.html" %}
-{% block title %}Analizador de Recetas - NutriApp{% endblock %}
+{% block title %}Recetas - NutriApp{% endblock %}
 
 {% block contenido %}
-<div class="card-soft">
-    <h2 class="brand">Analizador de Recetas</h2>
-    <p class="accent">Ingresa alimentos y sus calorías por porción.</p>
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card-soft">
+            <h2 class="brand">Recetas saludables</h2>
+            <p class="accent">Selecciona una receta para ver ingredientes y pasos.</p>
 
-    <form action="{{ url_for('recetas') }}" method="post">
-        <label>Lista de ingredientes (uno por línea):</label>
-        <textarea class="form-control" name="ingredientes" rows="6" placeholder="Ejemplo:
-Arroz 200 kcal
-Pollo 250 kcal
-Aceite 120 kcal"></textarea><br>
+            <div class="list-group mt-3">
+                {% for r in recetas %}
+                    <a class="list-group-item list-group-item-action" href="{{ url_for('receta_detalle', receta_id=r.id) }}">
+                        <h5 class="mb-1">{{ r.title }}</h5>
+                        <p class="mb-1">{{ r.description }}</p>
+                    </a>
+                {% endfor %}
+            </div>
 
-        <button class="btn-brand" type="submit">Analizar</button>
-    </form>
-
-    {% if total %}
-    <hr>
-    <h3 class="brand">Resultado:</h3>
-    <p><strong>Calorías totales:</strong> {{ total }} kcal</p>
-    {% endif %}
+            <a class="btn btn-outline-primary mt-3" href="{{ url_for('rutina') }}">Volver a rutina</a>
+        </div>
+    </div>
 </div>
 {% endblock %}

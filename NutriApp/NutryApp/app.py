@@ -1,3 +1,4 @@
+# ...existing code...
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 
 app = Flask(__name__)
@@ -10,6 +11,62 @@ def _get_first(form, *keys, default=''):
         if v is not None and v != '':
             return v
     return default
+
+# --- NUEVO: datos de recetas simples para la sección de recetas ---
+RECIPES = [
+    {
+        'id': 1,
+        'title': 'Bowl de avena con frutas y frutos secos',
+        'description': 'Desayuno energético con avena, leche, plátano, frutos secos y miel.',
+        'ingredients': [
+            '60 g avena',
+            '250 ml leche o bebida vegetal',
+            '1 plátano',
+            '1 cucharada de miel',
+            '30 g frutos secos (almendras, nueces)'
+        ],
+        'steps': [
+            'Cocina la avena con la leche a fuego medio por 5-7 minutos.',
+            'Sirve en un bowl, añade rodajas de plátano, frutos secos y miel al gusto.'
+        ]
+    },
+    {
+        'id': 2,
+        'title': 'Ensalada de quinoa y pollo',
+        'description': 'Almuerzo balanceado con proteína magra y carbohidratos complejos.',
+        'ingredients': [
+            '100 g quinoa cocida',
+            '120 g pechuga de pollo a la plancha',
+            'Tomate cherry',
+            'Pepino',
+            'Aderezo (aceite oliva, limón, sal)'
+        ],
+        'steps': [
+            'Cocina la quinoa según paquete y deja enfriar.',
+            'Corta el pollo en tiras y mezcla con la quinoa y verduras.',
+            'Aliña al gusto y sirve.'
+        ]
+    },
+    {
+        'id': 3,
+        'title': 'Salmón al horno con vegetales',
+        'description': 'Cena rica en proteínas y grasas saludables.',
+        'ingredients': [
+            '150 g filete de salmón',
+            'Brócoli, zanahoria y espárragos',
+            'Limón, sal y pimienta'
+        ],
+        'steps': [
+            'Coloca el salmón y vegetales en bandeja, rocía con aceite y limón.',
+            'Hornea a 180°C por 15-20 minutos hasta que el salmón esté cocido.'
+        ]
+    }
+]
+# ...existing code...
+
+
+
+
 
 @app.route('/')
 def inicio():
@@ -125,13 +182,81 @@ def login():
 
 @app.route('/rutina')
 def rutina():
-    """Muestra rutina personalizada."""
+    """Muestra rutina personalizada con detalle, dieta y enlaces a recetas."""
     user = session.get('user')
     if not user:
         flash('Debes completar el formulario primero.')
         return redirect(url_for('formulario'))
-    
-    return render_template('rutina.html', user=user)
+
+    # Generar rutina y plan de dieta según clasificación
+    clas = user.get('clasificacion', '').lower()
+    if 'bajo' in clas:
+        rutina_detalle = {
+            'descripcion': 'Enfocado en ganancia muscular y aumento calórico',
+            'plan_semanal': [
+                {'dia': 'Lunes', 'actividad': 'Fuerza — Tren superior (4 ejercicios, 3x8-12)'},
+                {'dia': 'Martes', 'actividad': 'Cardio ligero 20-30 min'},
+                {'dia': 'Miércoles', 'actividad': 'Fuerza — Tren inferior (4 ejercicios, 3x8-12)'},
+                {'dia': 'Jueves', 'actividad': 'Descanso activo: caminata 30 min'},
+                {'dia': 'Viernes', 'actividad': 'Fuerza — Full body (3 series por ejercicio)'},
+                {'dia': 'Sábado', 'actividad': 'Cardio ligero o actividad recreativa'},
+                {'dia': 'Domingo', 'actividad': 'Descanso completo'}
+            ],
+            'dieta': {
+                 'objetivo': 'Superávit calórico moderado (+300-500 kcal)',
+                'ejemplo': {
+                    'desayuno': 'Avena con leche, plátano y frutos secos (ver receta 1)',
+                    'media_mañana': 'Yogur griego con miel',
+                    'almuerzo': 'Quinoa con pollo y verduras (ver receta 2)',
+                    'merienda': 'Batido proteico con fruta',
+                    'cena': 'Pescado o pollo con verduras y patata'
+                }
+            }
+        }
+    elif 'normal' in clas:
+        rutina_detalle = {
+            'descripcion': 'Mantener condición y composición corporal',
+            'plan_semanal': [
+                {'dia': 'Lunes', 'actividad': 'Fuerza — Full body (3x8-12)'},
+                {'dia': 'Martes', 'actividad': 'Cardio moderado 30-40 min'},
+                {'dia': 'Miércoles', 'activity': 'Movilidad y core'},
+                {'dia': 'Jueves', 'actividad': 'Fuerza — Enfoque en técnica'},
+                {'dia': 'Viernes', 'actividad': 'Cardio intervalado 20-30 min'},
+                {'dia': 'Sábado', 'actividad': 'Actividad recreativa'},
+                {'dia': 'Domingo', 'actividad': 'Descanso activo'}
+            ],
+            'dieta': {
+                'objetivo': 'Mantener calorías de mantenimiento',
+                'ejemplo': {
+                    'desayuno': 'Tostadas integrales con aguacate y huevo',
+                    'almuerzo': 'Quinoa con pollo (ver receta 2)',
+                    'cena': 'Salmón al horno con vegetales (ver receta 3)'
+                }
+            }
+        }
+    else:
+        rutina_detalle = {
+            'descripcion': 'Reducir grasa corporal con déficit moderado y actividad cardiovascular',
+            'plan_semanal': [
+                {'dia': 'Lunes', 'actividad': 'Cardio 30-40 min + core'},
+                {'dia': 'Martes', 'actividad': 'Fuerza — Enfoque en grandes grupos musculares (3x8-12)'},
+                {'dia': 'Miércoles', 'actividad': 'HIIT 20-25 min'},
+                {'dia': 'Jueves', 'actividad': 'Fuerza — Técnica y movilidad'},
+                {'dia': 'Viernes', 'actividad': 'Cardio moderado 40 min'},
+                {'dia': 'Sábado', 'actividad': 'Actividad recreativa ligera'},
+                {'dia': 'Domingo', 'actividad': 'Descanso'}
+            ],
+            'dieta': {
+                'objetivo': 'Déficit calórico moderado (-300-600 kcal), alta proteína',
+                'ejemplo': {
+'desayuno': 'Omelette con verduras',
+                    'almuerzo': 'Ensalada grande con proteína magra (pollo o pescado)',
+                    'cena': 'Verduras asadas con porción de quinoa'
+                }
+            }
+        }
+
+    return render_template('rutina.html', user=user, rutina=rutina_detalle)
 
 @app.route('/perfil')
 def perfil():
@@ -236,6 +361,21 @@ def logout():
     session.pop('user', None)
     flash('Sesión cerrada.')
     return redirect(url_for('inicio'))
+
+@app.route('/recetas')
+def recetas():
+    """Lista de recetas disponibles."""
+    return render_template('recetas.html', recetas=RECIPES)
+
+@app.route('/recetas/<int:receta_id>')
+def receta_detalle(receta_id):
+    """Detalle de una receta."""
+    receta = next((r for r in RECIPES if r['id'] == receta_id), None)
+    if not receta:
+        flash('Receta no encontrada.')
+        return redirect(url_for('recetas'))
+    return render_template('receta_detalle.html', receta=receta)
+# ...existing code...
 
 if __name__ == '__main__':
     app.run(debug=True)

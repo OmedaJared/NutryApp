@@ -1,48 +1,47 @@
-<!doctype html>
-<html lang="es">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Rutina y Plan</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/colors.css') }}">
-</head>
-<body>
-    <div class="container-card">
-        <div class="card shadow-sm" style="background-color: rgb(208, 172, 247);"></div>
+{% extends "base.html" %}
+{% block title %}Rutina - NutriApp{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
         <div class="card-soft">
-            <h2 class="brand">Rutina y Plan de Alimentación</h2>
-            <p>Usuario: <strong>{{ user.nombre }} {{ user.apellido }}</strong></p>
-            <hr>
+            <h2 class="brand">Rutina personalizada</h2>
+            <p class="accent">{{ rutina.descripcion }}</p>
 
-            <h4>Resumen</h4>
-            <p><strong>IMC:</strong> {{ user.imc }} — <strong>{{ user.clasificacion }}</strong></p>
-            <p><strong>Calorías estimadas de mantenimiento:</strong> {{ user.calorias }} kcal</p>
+            <h4 class="mt-3">Plan semanal</h4>
+            <ul>
+                {% for dia in rutina.plan_semanal %}
+                    <li><strong>{{ dia.dia }}:</strong> {{ dia.actividad or dia.activity }}</li>
+                {% endfor %}
+            </ul>
 
-            <h4>Rutina sugerida</h4>
-            {% if user.clasificacion == 'Bajo peso' %}
-                <p>Enfócate en entrenamiento de fuerza 3-4 veces/semana y calorías en superávit. Ejemplo: 3 días full body, 2 días cardio suave.</p>
-            {% elif user.clasificacion == 'Peso normal' %}
-                <p>Mantén actividad mixta: 3 días de fuerza + 2 días de cardio. Mantén calorías de mantenimiento.</p>
-            {% elif user.clasificacion == 'Sobrepeso' %}
-                <p>Prioriza cardio moderado 4-5 veces/semana y 2 días de fuerza. Apunta a déficit calórico suave.</p>
-            {% else %}
-                <p>Cardio regular y consulta profesional. Combina 3 días de fuerza con 3 días de actividad aeróbica.</p>
-            {% endif %}
+            <h4 class="mt-3">Ejemplo de sesión de fuerza (día de tren superior)</h4>
+            <ol>
+                <li>Calentamiento: 8-10 min bici o trote suave + movilidad articular.</li>
+                <li>Press de banca: 4 series de 8-12 repeticiones — 90s descanso.</li>
+                <li>Remo con mancuerna: 4x8-12 — 90s descanso.</li>
+                <li>Press militar con barra o mancuerna: 3x8-12.</li>
+                <li>Pájaros o face pulls: 3x12-15.</li>
+                <li>Core: Plank 3x45s.</li>
+                <li>Estiramiento final 5-7 min.</li>
+            </ol>
 
-            <h4>Plan de alimentación (orientativo)</h4>
-            {% if user.clasificacion == 'Bajo peso' %}
-                <p>Aumenta calorías con comidas densas y nutritivas: batidos con proteína, frutos secos, carbohidratos complejos.</p>
-            {% elif user.clasificacion == 'Peso normal' %}
-                <p>Dieta balanceada con 3 comidas principales y 1-2 colaciones. Proteína en cada comida, frutas y verduras.</p>
-            {% else %}
-                <p>Reduce azúcares y fritos, aumenta verduras y proteínas magras. Controla porciones y evita bebidas azucaradas.</p>
-            {% endif %}
+            <h4 class="mt-3">Plan de dieta (objetivo: {{ rutina.dieta.objetivo }})</h4>
+            <p><strong>Ejemplo de comidas:</strong></p>
+            <ul>
+                {% for key, meal in rutina.dieta.ejemplo.items() %}
+                    <li><strong>{{ key | capitalize }}:</strong> {{ meal }}</li>
+                {% endfor %}
+            </ul>
 
-            <nav style="margin-top:15px;">
-                <a class="btn-brand" href="{{ url_for('perfil') }}">Ver mis datos</a>
-                <a class="btn-brand" href="{{ url_for('logout') }}" style="margin-left:10px;">Cerrar sesión</a>
+            <p class="mt-3">Para ver recetas y formas de preparación haz clic en <a href="{{ url_for('recetas') }}">Recetas</a>.</p>
+
+            <nav class="mt-4">
+                <a class="btn-brand" href="{{ url_for('perfil') }}">Ver mi perfil</a>
+                <a class="btn btn-outline-secondary" href="{{ url_for('recetas') }}" style="margin-left:10px;">Ver recetas</a>
+                <a class="btn btn-danger" href="{{ url_for('logout') }}" style="margin-left:10px;">Cerrar sesión</a>
             </nav>
         </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}
