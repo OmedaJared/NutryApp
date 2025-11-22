@@ -4,85 +4,73 @@ app = Flask(__name__)
 app.secret_key = 'cambia_esto_en_produccion'
 
 def _get_first(form, *keys, default=''):
-    """Returns the first non-empty value from the form for the given keys."""
+    """Retorna el primer valor no vacío del formulario."""
     for k in keys:
         v = form.get(k)
-        if v is not None:
+        if v is not None and v != '':
             return v
     return default
 
-@app.route('/clear')
-def clear():
-    """Borrar datos del usuario guardados en sesión y volver al formulario."""
-    session.pop('user', None)
-    session.pop('authenticated', None)
-    flash('Datos borrados.')
-    return redirect(url_for('formulario'))
-
 @app.route('/')
 def inicio():
-    """Home page with information about the application."""
+    """Página de inicio con información."""
     return render_template('info.html')
 
 @app.route('/formulario')
 def formulario():
-    """Page that contains the form for user input."""
+    """Página del formulario de registro."""
     user = session.get('user', {})
-    return render_template('formulario.html', **user)
+    error = session.pop('error', None)
+    return render_template('formulario.html', error=error, **user)
 
 @app.route('/resultado', methods=['POST'])
 def resultado():
-    """Processes the form data and calculates BMI and caloric needs."""
-    nombre = _get_first(request.form, 'nombre', 'Nombre', '').strip()
-    apellido = _get_first(request.form, 'apellido', 'Apellido', '').strip()
-    edad_raw = _get_first(request.form, 'edad', 'Edad', '')
-    peso_raw = _get_first(request.form, 'peso', 'Peso', '')
-    altura_raw = _get_first(request.form, 'altura', 'Altura', '')
-    contraseña = _get_first(request.form, 'contraseña', 'contrasena', '')
-    correo_electronico = _get_first(request.form, 'correo_electronico', 'correo', '')
-    genero = _get_first(request.form, 'genero', 'Genero', 'masculino')
-
+    """Procesa formulario y calcula IMC y calorías."""
+    nombre = request.form.get('nombre', '').strip()
+    apellido = request.form.get('apellido', '').strip()
+    correo_electronico = request.form.get('correo_electronico', '').strip()
+    contraseña = request.form.get('contraseña', '')
+    genero = request.form.get('genero', 'masculino').lower()
+    
     try:
-        edad = int(edad_raw)
-        peso = float(peso_raw)
-        altura = float(altura_raw)
+        edad = int(request.form.get('edad', 0))
+        peso = float(request.form.get('peso', 0))
+        altura = float(request.form.get('altura', 0))
     except (ValueError, TypeError):
-        error_msg = "Por favor completa todos los campos correctamente."
-        return render_template(
-            'formulario.html',
-            nombre=nombre,
-            apellido=apellido,
-            edad=edad_raw,
-            peso=peso_raw,
-            altura=altura_raw,
-            genero=genero,
-            correo_electronico=correo_electronico,
-            contraseña=contraseña,
-            error=error_msg
-        )
-
+        session['error'] = 'Error: Verifica que edad, peso y altura sean números válidos.'
+        return redirect(url_for('formulario'))
+    
+    if edad <= 0 or peso <= 0 or altura <= 0:
+        session['error'] = 'Error: Los valores deben ser mayores a 0.'
+        return redirect(url_for('formulario'))
+    
+    # Calcular IMC
     imc = round(peso / (altura ** 2), 2)
-
+    
+    # Clasificar IMC
     if imc < 18.5:
-        clasificacion = "Bajo peso"
-        recomendacion = "Aumenta tu ingesta calórica con alimentos saludables y realiza ejercicios de fuerza."
+        clasificacion = 'Bajo peso'
+        recomendacion = 'Aumenta tu ingesta calórica de forma saludable.'
     elif imc < 25:
-        clasificacion = "Peso normal"
-        recomendacion = "Mantén una dieta equilibrada y continúa con actividad física regular."
+        clasificacion = 'Peso normal'
+        recomendacion = 'Mantén tu peso actual con hábitos saludables.'
     elif imc < 30:
-        clasificacion = "Sobrepeso"
-        recomendacion = "Reduce azúcares y grasas, e incrementa tu consumo de frutas y verduras."
+        clasificacion = 'Sobrepeso'
+        recomendacion = 'Considera aumentar actividad física y revisar tu dieta.'
     else:
-        clasificacion = "Obesidad"
-        recomendacion = "Consulta a un especialista y adopta un plan de alimentación controlado."
-
-    if genero.lower() == "masculino":
-        tmb = 10 * peso + 6.25 * (altura * 100) - 5 * edad + 5
+        clasificacion = 'Obesidad'
+        recomendacion = 'Consulta a un profesional de salud.'
+    
+    # Calcular TMB (Harris-Benedict)
+    if genero == 'masculino':
+        tmb = 88.362 + (13.397 * peso) + (4.799 * (altura * 100)) - (5.677 * edad)
     else:
-        tmb = 10 * peso + 6.25 * (altura * 100) - 5 * edad - 161
-
-    calorias_mantenimiento = round(tmb * 1.55, 2)
-
+        tmb = 447.593 + (9.247 * peso) + (3.098 * (altura * 100)) - (4.330 * edad)
+    
+    tmb = round(tmb, 2)
+    calorias = round(tmb * 1.55, 2)
+    
+    # Guardar en sesión
     session['user'] = {
         'nombre': nombre,
         'apellido': apellido,
@@ -95,9 +83,9 @@ def resultado():
         'imc': imc,
         'clasificacion': clasificacion,
         'recomendacion': recomendacion,
-        'calorias': calorias_mantenimiento
+        'calorias': calorias
     }
-
+    
     return render_template(
         'formulario.html',
         nombre=nombre,
@@ -111,145 +99,143 @@ def resultado():
         imc=imc,
         clasificacion=clasificacion,
         recomendacion=recomendacion,
-        calorias=calorias_mantenimiento
+        calorias=calorias
     )
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """Login with correo and contraseña stored from formulario."""
+    """Login con correo y contraseña."""
     if request.method == 'GET':
         return render_template('login.html')
+    
     correo = request.form.get('correo', '').strip()
     contraseña = request.form.get('contraseña', '')
     user = session.get('user')
+    
     if not user:
-        flash('No hay datos registrados. Completa primero el formulario.')
+        flash('Primero debes completar el formulario.')
         return redirect(url_for('formulario'))
+    
     if correo == user.get('correo_electronico') and contraseña == user.get('contraseña'):
         session['authenticated'] = True
         return redirect(url_for('rutina'))
+    
     flash('Correo o contraseña incorrectos.')
     return render_template('login.html')
 
 @app.route('/rutina')
 def rutina():
-    """Muestra rutina y plan basado en los datos guardados.
-
-    Permite acceso si existe 'user' en sesión incluso cuando no hay flag
-    'authenticated' (para que el botón 'Ir a rutina' funcione sin pedir login).
-    """
+    """Muestra rutina personalizada."""
     user = session.get('user')
     if not user:
-        flash('Completa el formulario o inicia sesión para ver tu rutina.')
+        flash('Debes completar el formulario primero.')
         return redirect(url_for('formulario'))
-
-    if not session.get('authenticated'):
-        session['authenticated'] = True
+    
     return render_template('rutina.html', user=user)
-
-@app.route("/tmb", methods=["GET", "POST"])
-def tmb():
-    if request.method == "POST":
-        try:
-            peso = float(request.form["peso"])
-            altura = float(request.form["altura"])
-            edad = int(request.form["edad"])
-            genero = request.form["genero"]
-
-            if genero == "masculino":
-                tmb = 88.36 + 13.4 * peso + 4.8 * altura - 5.7 * edad
-            else:
-                tmb = 447.6 + 9.2 * peso + 3.1 * altura - 4.3 * edad
-
-            return render_template("tmb.html", tmb=round(tmb, 2), peso=peso,
-                                altura=altura, edad=edad, genero=genero)
-        except:
-            return render_template("tmb.html", error="Datos inválidos")
-
-    return render_template("tmb.html")
 
 @app.route('/perfil')
 def perfil():
-    """Muestra toda la información del usuario y botón para cerrar sesión."""
-    if not session.get('authenticated'):
-        flash('Inicia sesión para ver tu perfil.')
-        return redirect(url_for('login'))
-    user = session.get('user', {})
+    """Muestra perfil del usuario."""
+    user = session.get('user')
+    if not user:
+        flash('Debes completar el formulario primero.')
+        return redirect(url_for('formulario'))
+    
     return render_template('perfil.html', user=user)
 
-@app.route("/gct", methods=["GET", "POST"])
+@app.route('/tmb', methods=['GET', 'POST'])
+def tmb():
+    """Calculadora de TMB."""
+    if request.method == 'POST':
+        try:
+            peso = float(request.form.get('peso', 0))
+            altura = float(request.form.get('altura', 0))
+            edad = int(request.form.get('edad', 0))
+            genero = request.form.get('genero', 'masculino').lower()
+            
+            if genero == 'masculino':
+                tmb_calc = 88.362 + (13.397 * peso) + (4.799 * altura) - (5.677 * edad)
+            else:
+                tmb_calc = 447.593 + (9.247 * peso) + (3.098 * altura) - (4.330 * edad)
+            
+            tmb_calc = round(tmb_calc, 2)
+            return render_template('tmb.html', tmb=tmb_calc, peso=peso, altura=altura, edad=edad, genero=genero)
+        except (ValueError, TypeError):
+            return render_template('tmb.html', error='Valores inválidos.')
+    
+    return render_template('tmb.html')
+
+@app.route('/gct', methods=['GET', 'POST'])
 def gct():
-    if request.method == "POST":
-        tmb = float(request.form["tmb"])
-        actividad = float(request.form["actividad"])
-        gct = tmb * actividad
-        return render_template("gct.html", gct=round(gct, 1))
-    return render_template("gct.html")
+    """Calculadora de Gasto Calórico Total."""
+    if request.method == 'POST':
+        try:
+            tmb_val = float(request.form.get('tmb', 0))
+            actividad = float(request.form.get('actividad', 1.55))
+            gct_calc = round(tmb_val * actividad, 2)
+            return render_template('gct.html', gct=gct_calc, tmb=tmb_val, actividad=actividad)
+        except (ValueError, TypeError):
+            return render_template('gct.html', error='Valores inválidos.')
+    
+    return render_template('gct.html')
+
+@app.route('/peso_ideal', methods=['GET', 'POST'])
+def peso_ideal():
+    """Calculadora de peso ideal (fórmula de Devine)."""
+    if request.method == 'POST':
+        try:
+            altura_cm = float(request.form.get('altura', 0))
+            genero = request.form.get('genero', 'masculino').lower()
+            
+            altura_m = altura_cm / 100
+            if genero == 'masculino':
+                ideal = 50 + (2.3 * (altura_cm - 152.4))
+            else:
+                ideal = 45.5 + (2.3 * (altura_cm - 152.4))
+            
+            ideal = round(ideal, 2)
+            return render_template('peso_ideal.html', ideal=ideal, altura=altura_cm, genero=genero)
+        except (ValueError, TypeError):
+            return render_template('peso_ideal.html', error='Altura inválida.')
+    
+    return render_template('peso_ideal.html')
+
+@app.route('/macros', methods=['GET', 'POST'])
+def macros():
+    """Calculadora de macronutrientes."""
+    if request.method == 'POST':
+        try:
+            calorias = float(request.form.get('calorias', 0))
+            p_pct = float(request.form.get('p', 30))
+            c_pct = float(request.form.get('c', 40))
+            g_pct = float(request.form.get('g', 30))
+            
+            prot = round((calorias * p_pct / 100) / 4, 2)
+            carb = round((calorias * c_pct / 100) / 4, 2)
+            fat = round((calorias * g_pct / 100) / 9, 2)
+            
+            macros_result = {'prot': prot, 'carb': carb, 'fat': fat}
+            return render_template('macros.html', macros=macros_result, calorias=calorias, p=p_pct, c=c_pct, g=g_pct)
+        except (ValueError, TypeError):
+            return render_template('macros.html', error='Valores inválidos.')
+    
+    return render_template('macros.html')
+
+@app.route('/clear')
+def clear():
+    """Borrar datos del usuario."""
+    session.pop('user', None)
+    session.pop('authenticated', None)
+    flash('Datos borrados.')
+    return redirect(url_for('formulario'))
 
 @app.route('/logout')
 def logout():
-    """Cerrar sesión y regresar al inicio."""
+    """Cerrar sesión."""
     session.pop('authenticated', None)
-
     session.pop('user', None)
     flash('Sesión cerrada.')
     return redirect(url_for('inicio'))
-
-@app.route("/peso_ideal", methods=["GET", "POST"])
-def peso_ideal():
-    if request.method == "POST":
-        altura = float(request.form["altura"])
-        genero = request.form["genero"]
-
-        base = altura - 152.4
-
-        if genero == "masculino":
-            ideal = 50 + 0.9 * base
-        else:
-            ideal = 45.5 + 0.9 * base
-
-        return render_template("peso_ideal.html", ideal=round(ideal, 1))
-
-    return render_template("peso_ideal.html")
-
-@app.route("/macros", methods=["GET", "POST"])
-def macros():
-    if request.method == "POST":
-        calorias = float(request.form["calorias"])
-        p = float(request.form["p"])
-        c = float(request.form["c"])
-        g = float(request.form["g"])
-
-        kcal_p = calorias * p / 100
-        kcal_c = calorias * c / 100
-        kcal_g = calorias * g / 100
-
-        resultado = {
-            "prot": round(kcal_p / 4, 1),
-            "carb": round(kcal_c / 4, 1),
-            "fat": round(kcal_g / 9, 1)
-        }
-
-        return render_template("macros.html", macros=resultado)
-
-    return render_template("macros.html")
-
-@app.route("/recetas", methods=["GET", "POST"])
-def recetas():
-    if request.method == "POST":
-        texto = request.form["ingredientes"].strip().split("\n")
-
-        total = 0
-        for l in texto:
-            try:
-                kcal = float(l.split()[-2]) if "kcal" in l else float(l.split()[-1])
-                total += kcal
-            except:
-                pass
-
-        return render_template("recetas.html", total=round(total, 1))
-
-    return render_template("recetas.html")
 
 if __name__ == '__main__':
     app.run(debug=True)

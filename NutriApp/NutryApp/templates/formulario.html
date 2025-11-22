@@ -3,61 +3,92 @@
 {% block title %}Formulario - NutriApp{% endblock %}
 
 {% block contenido %}
-<div class="card-soft">
-    <section>
-        <h2 class="brand">Registro de datos personales</h2>
-        <p class="accent">Ingresa tus datos para calcular tu IMC y tus calorías diarias aproximadas.</p>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-5">
+                <h2 class="card-title brand mb-3">📋 Registro de datos personales</h2>
+                <p class="accent">Ingresa tus datos para calcular tu IMC y tus calorías diarias.</p>
 
-        {% if error %}
-            <p class="error"><strong>{{ error }}</strong></p>
-        {% endif %}
+                {% if error %}
+                    <div class="alert alert-danger" role="alert">
+                        <strong>Error:</strong> {{ error }}
+                    </div>
+                {% endif %}
 
-        <form id="datosForm" action="{{ url_for('resultado') }}" method="post">
-            <label>Nombre:</label><br>
-            <input class="form-control" type="text" name="nombre" value="{{ nombre or '' }}" required><br>
+                <form id="datosForm" action="{{ url_for('resultado') }}" method="post">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre:</label>
+                            <input class="form-control" type="text" name="nombre" value="{{ nombre or '' }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Apellido:</label>
+                            <input class="form-control" type="text" name="apellido" value="{{ apellido or '' }}" required>
+                        </div>
+                    </div>
 
-            <label>Apellido:</label><br>
-            <input class="form-control" type="text" name="apellido" value="{{ apellido or '' }}" required><br>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Edad (años):</label>
+                            <input class="form-control" type="number" name="edad" min="1" value="{{ edad or '' }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Género:</label>
+                            <select class="form-select" name="genero" required>
+                                <option value="masculino" {% if genero == 'masculino' %}selected{% endif %}>Masculino</option>
+                                <option value="femenino" {% if genero == 'femenino' %}selected{% endif %}>Femenino</option>
+                            </select>
+                        </div>
+                    </div>
 
-            <label>Edad (años):</label><br>
-            <input class="form-control" type="number" name="edad" min="1" value="{{ edad or '' }}" required><br>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Peso (kg):</label>
+                            <input class="form-control" type="number" step="0.1" name="peso" value="{{ peso or '' }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Altura (m):</label>
+                            <input class="form-control" type="number" step="0.01" name="altura" value="{{ altura or '' }}" required>
+                        </div>
+                    </div>
 
-            <label>Peso (kg):</label><br>
-            <input class="form-control" type="number" step="0.1" name="peso" value="{{ peso or '' }}" required><br>
+                    <div class="mb-3">
+                        <label class="form-label">Correo Electrónico:</label>
+                        <input class="form-control" type="email" name="correo_electronico" value="{{ correo_electronico or '' }}" required>
+                    </div>
 
-            <label>Altura (m):</label><br>
-            <input class="form-control" type="number" step="0.01" name="altura" value="{{ altura or '' }}" required><br>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña:</label>
+                        <input class="form-control" type="password" name="contraseña" required>
+                    </div>
 
-            <label>Correo Electrónico:</label><br>
-            <input class="form-control" type="email" name="correo_electronico" value="{{ correo_electronico or '' }}" required><br>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
+                        <button class="btn btn-primary btn-lg" type="submit">📊 Calcular resultados</button>
+                        <button class="btn btn-secondary btn-lg" type="reset">🔄 Limpiar</button>
+                        <a class="btn btn-outline-primary btn-lg" href="{{ url_for('clear') }}">🗑️ Borrar datos</a>
+                    </div>
+                </form>
 
-            <label>Contraseña:</label><br>
-            <input class="form-control" type="password" name="contraseña" value="{{ contraseña or '' }}" required><br>
-
-            <label>Género:</label><br>
-            <select class="form-control" name="genero" required>
-                <option value="masculino" {% if genero == 'masculino' %}selected{% endif %}>Masculino</option>
-                <option value="femenino" {% if genero == 'femenino' %}selected{% endif %}>Femenino</option>
-            </select><br>
-
-            <div style="margin-top:10px;">
-                <button class="btn-brand" type="submit">Calcular resultados</button>
-                <button class="btn-brand" type="reset" style="margin-left:8px;">Limpiar (local)</button>
-                <a class="btn-brand" href="{{ url_for('clear') }}" style="margin-left:8px; text-decoration:none;">Borrar datos (servidor)</a>
-                <a class="btn-brand" href="{{ url_for('rutina') }}" style="margin-left:8px; text-decoration:none;">Ir a rutina</a>
+                {% if imc %}
+                <hr class="my-4">
+                <section>
+                    <h3 class="brand mb-3">📈 Resultados nutricionales</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <p><strong>IMC:</strong> <span class="badge bg-primary">{{ imc }}</span></p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <p><strong>Clasificación:</strong> <span class="badge bg-success">{{ clasificacion }}</span></p>
+                        </div>
+                    </div>
+                    <p><strong>Recomendación:</strong> {{ recomendacion }}</p>
+                    <p><strong>Calorías diarias estimadas:</strong> <span class="badge bg-warning text-dark">{{ calorias }} kcal</span></p>
+                    <a class="btn btn-success mt-3" href="{{ url_for('rutina') }}">Ver rutina personalizada →</a>
+                </section>
+                {% endif %}
             </div>
-        </form>
-
-        {% if imc %}
-        <hr>
-        <section>
-            <h2 class="brand">Resultados nutricionales</h2>
-            <p><strong>IMC:</strong> {{ imc }}</p>
-            <p><strong>Clasificación:</strong> {{ clasificacion }}</p>
-            <p><strong>Recomendación:</strong> {{ recomendacion }}</p>
-            <p><strong>Calorías diarias estimadas:</strong> {{ calorias }} kcal</p>
-        </section>
-        {% endif %}
-    </section>
+        </div>
+    </div>
 </div>
 {% endblock %}
