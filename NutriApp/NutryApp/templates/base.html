@@ -43,14 +43,14 @@
     <main>
         <div class="container my-5">
             {% with messages = get_flashed_messages() %}
-              {% if messages %}
+            {% if messages %}
                 {% for m in messages %}
-                  <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
                     {{ m }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                  </div>
+                </div>
                 {% endfor %}
-              {% endif %}
+            {% endif %}
             {% endwith %}
             {% block contenido %}{% endblock %}
         </div>

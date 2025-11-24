@@ -16,11 +16,11 @@
                     <p class="accent">Usa el correo y contraseña que registraste en el formulario.</p>
 
                     {% with messages = get_flashed_messages() %}
-                      {% if messages %}
+                        {% if messages %}
                         {% for m in messages %}
-                          <div class="alert alert-warning">{{ m }}</div>
+                            <div class="alert alert-warning">{{ m }}</div>
                         {% endfor %}
-                      {% endif %}
+                    {% endif %}
                     {% endwith %}
 
                     <form action="{{ url_for('login') }}" method="post">

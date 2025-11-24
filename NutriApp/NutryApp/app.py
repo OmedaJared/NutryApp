@@ -12,7 +12,6 @@ def _get_first(form, *keys, default=''):
             return v
     return default
 
-# --- NUEVO: datos de recetas simples para la sección de recetas ---
 RECIPES = [
     {
         'id': 1,
@@ -64,10 +63,6 @@ RECIPES = [
 ]
 # ...existing code...
 
-
-
-
-
 @app.route('/')
 def inicio():
     """Página de inicio con información."""
@@ -101,10 +96,8 @@ def resultado():
         session['error'] = 'Error: Los valores deben ser mayores a 0.'
         return redirect(url_for('formulario'))
     
-    # Calcular IMC
     imc = round(peso / (altura ** 2), 2)
     
-    # Clasificar IMC
     if imc < 18.5:
         clasificacion = 'Bajo peso'
         recomendacion = 'Aumenta tu ingesta calórica de forma saludable.'
@@ -118,7 +111,6 @@ def resultado():
         clasificacion = 'Obesidad'
         recomendacion = 'Consulta a un profesional de salud.'
     
-    # Calcular TMB (Harris-Benedict)
     if genero == 'masculino':
         tmb = 88.362 + (13.397 * peso) + (4.799 * (altura * 100)) - (5.677 * edad)
     else:
@@ -127,7 +119,6 @@ def resultado():
     tmb = round(tmb, 2)
     calorias = round(tmb * 1.55, 2)
     
-    # Guardar en sesión
     session['user'] = {
         'nombre': nombre,
         'apellido': apellido,
@@ -188,7 +179,6 @@ def rutina():
         flash('Debes completar el formulario primero.')
         return redirect(url_for('formulario'))
 
-    # Generar rutina y plan de dieta según clasificación
     clas = user.get('clasificacion', '').lower()
     if 'bajo' in clas:
         rutina_detalle = {
@@ -203,7 +193,7 @@ def rutina():
                 {'dia': 'Domingo', 'actividad': 'Descanso completo'}
             ],
             'dieta': {
-                 'objetivo': 'Superávit calórico moderado (+300-500 kcal)',
+                'objetivo': 'Superávit calórico moderado (+300-500 kcal)',
                 'ejemplo': {
                     'desayuno': 'Avena con leche, plátano y frutos secos (ver receta 1)',
                     'media_mañana': 'Yogur griego con miel',
