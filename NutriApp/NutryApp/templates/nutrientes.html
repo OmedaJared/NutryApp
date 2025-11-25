@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Buscador de Nutrientes - NutriApp{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-5">
+                <h2 class="card-title brand mb-3">🥕 Buscador de Nutrientes</h2>
+                <p class="accent">Busca un alimento y obtén información detallada sobre sus nutrientes.</p>
+
+                {% if error %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error:</strong> {{ error }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endif %}
+
+                <form action="{{ url_for('nutrientes') }}" method="post" class="mb-4">
+                    <div class="input-group input-group-lg">
+                        <input 
+                            class="form-control" 
+                            type="text" 
+                            name="alimento" 
+                            placeholder="Ej: manzana, pollo, arroz, pan integral..."
+                            value="{{ alimento or '' }}"
+                            required>
+                        <button class="btn btn-primary" type="submit">🔍 Buscar</button>
+                    </div>
+                    <small class="text-muted d-block mt-2">Puedes escribir en español. Ej: plátano, zanahoria, huevo.</small>
+                </form>
+
+                {% if alimentos %}
+                    <h3 class="brand mb-3">Resultados encontrados:</h3>
+                    
+                    {% if alimentos|length == 0 %}
+                        <div class="alert alert-warning" role="alert">
+                            No se encontraron resultados para "<strong>{{ alimento }}</strong>". 
+                            Intenta con otro término.
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            {% for item in alimentos %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ item.description }}</h5>
+                                            <button 
+                                                class="btn btn-outline-primary btn-sm" 
+                                                type="button" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#nutrientes-{{ loop.index }}">
+                                                Ver nutrientes →
+                                            </button>
+                                            
+                                            <div class="collapse mt-3" id="nutrientes-{{ loop.index }}">
+                                                <div class="card card-body border-0" style="background-color: rgba(0,0,0,0.02);">
+                                                    {% if item.nutrients %}
+                                                        <table class="table table-sm mb-0">
+                                                            <tbody>
+                                                                {% for nutrient in item.nutrients %}
+                                                                    <tr>
+                                                                        <td><strong>{{ nutrient.name }}</strong></td>
+                                                                        <td class="text-end">{{ nutrient.value }} {{ nutrient.unitName }}</td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    {% else %}
+                                                        <p class="text-muted mb-0">No hay información de nutrientes disponible.</p>
+                                                    {% endif %}
+                                                    
+                                                    {% if item.foodCategory %}
+                                                        <hr class="my-2">
+                                                        <small class="text-muted"><strong>Categoría:</strong> {{ item.foodCategory }}</small>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+
+                {% if not alimentos and alimento %}
+                    <div class="alert alert-info" role="alert">
+                        <strong>Sin resultados:</strong> No se encontró información para "{{ alimento }}". 
+                        Intenta con otro alimento o verifica la ortografía.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

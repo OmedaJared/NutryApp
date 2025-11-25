@@ -1,11 +1,128 @@
 # ...existing code...
 from flask import Flask, render_template, request, redirect, url_for, flash, session
+import requests
 
 app = Flask(__name__)
 app.secret_key = 'cambia_esto_en_produccion'
 
-api_key="tN2XZsdySpg5RvS75AJNOLrDHjPbny4W64vfXF3N"
-API_URL="https://api.nal.usda.gov/fdc/v1/foods/search"
+# ...existing code...
+
+API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
+API_KEY = "tN2XZsdySpg5RvS75AJNOLrDHJPbny4W64vfX3N"
+
+# ...existing code...
+
+@app.route('/nutrientes', methods=['GET', 'POST'])
+def nutrientes():
+    """Busca alimentos en la base de datos USDA y muestra nutrientes.
+    Soporta búsqueda en español."""
+    alimento = None
+    alimentos = None
+    error = None
+
+    if request.method == 'POST':
+        alimento = request.form.get('alimento', '').strip()
+        
+        if not alimento:
+            error = 'Por favor ingresa el nombre de un alimento.'
+        elif len(alimento) < 2:
+            error = 'El término debe tener al menos 2 caracteres.'
+        else:
+            try:
+                params = {
+                    'query': alimento,
+                    'api_key': API_KEY,
+                    'pageSize': 10
+                }
+                
+                response = requests.get(API_URL, params=params, timeout=10)
+                
+                if response.status_code == 200:
+                    datos = response.json()
+                    foods = datos.get('foods', [])
+                    
+                    if not foods:
+                        error = f'No se encontraron alimentos para "{alimento}". Intenta con otro término.'
+                    else:
+                        # ...existing code...
+                        alimentos = []
+                        for food in foods:
+                            # Filtrar nutrientes principales
+                            nutrients = []
+                            nutrient_map = {
+                                'Energy': ('Energía', 'kcal'),
+                                'Protein': ('Proteína', 'g'),
+                                'Total lipid (fat)': ('Grasa total', 'g'),
+                                'Carbohydrate, by difference': ('Carbohidratos', 'g'),
+                                'Fiber, total dietary': ('Fibra', 'g'),
+                                'Sugars, total': ('Azúcares', 'g'),
+                                'Calcium, Ca': ('Calcio', 'mg'),
+                                'Iron, Fe': ('Hierro', 'mg'),
+                                'Potassium, K': ('Potasio', 'mg'),
+                                'Sodium, Na': ('Sodio', 'mg'),
+                                'Vitamin A, RAE': ('Vitamina A', 'mcg'),
+                                'Vitamin C, total ascorbic acid': ('Vitamina C', 'mg'),
+                                'Vitamin D (D2 + D3)': ('Vitamina D', 'mcg'),
+                                'Folate, total': ('Folato', 'mcg'),
+                                'Zinc, Zn': ('Zinc', 'mg')
+                            }
+                            
+                            for nut in food.get('foodNutrients', []):
+                                nut_name = nut.get('nutrientName', '')
+                                for eng_name, (es_name, unit) in nutrient_map.items():
+                                    if eng_name.lower() in nut_name.lower():
+                                        value = round(nut.get('value', 0), 2)
+                                        nutrients.append({
+                                            'name': es_name,
+                                            'value': value,
+                                            'unitName': unit
+                                        })
+                                        break
+                            # Tomar todos los nutrientes que devuelve la API y mostrarlos tal cual
+                            nutrients = []
+                            for nut in food.get('foodNutrients', []):
+                                name = nut.get('nutrientName') or nut.get('name') or 'Desconocido'
+                                unit = nut.get('unitName') or nut.get('unit') or ''
+                                raw_value = nut.get('value')
+                                if raw_value is None:
+                                    continue
+                                try:
+                                    value = round(float(raw_value), 2)
+                                except (ValueError, TypeError):
+                                    value = raw_value
+                                nutrients.append({
+                                    'name': name,
+                                    'value': value,
+                                    'unitName': unit
+                                })
+                            # Opcional: ordenar por nombre para mejor lectura
+                            nutrients = sorted(nutrients, key=lambda x: x['name'])
+                            
+                            alimentos.append({
+                                'description': food.get('description', 'Sin descripción'),
+                                'foodCategory': food.get('foodCategory', 'Categoría desconocida'),
+                                'nutrients': nutrients
+                            })
+# ...existing code...                     
+                
+                elif response.status_code == 401:
+                    error = 'Error de autenticación con la API. Por favor intenta más tarde.'
+                elif response.status_code == 429:
+                    error = 'Límite de solicitudes alcanzado. Intenta de nuevo en unos minutos.'
+                else:
+                    error = f'Error en la solicitud (código {response.status_code}). Intenta de nuevo.'
+                    
+            except requests.exceptions.Timeout:
+                error = 'La solicitud tardó demasiado. Intenta de nuevo.'
+            except requests.exceptions.ConnectionError:
+                error = 'Error de conexión. Verifica tu conexión a internet.'
+            except Exception as e:
+                error = f'Ocurrió un error inesperado: {str(e)}'
+
+    return render_template('nutrientes.html', alimento=alimento, alimentos=alimentos, error=error)
+
+# ...existing code...
+
 
 def _get_first(form, *keys, default=''):
     """Retorna el primer valor no vacío del formulario."""
@@ -15,6 +132,8 @@ def _get_first(form, *keys, default=''):
             return v
     return default
 
+# ...existing code...
+# --- NUEVO: datos de recetas simples para la sección de recetas (ampliado) ---
 RECIPES = [
     {
         'id': 1,
@@ -62,18 +181,163 @@ RECIPES = [
             'Coloca el salmón y vegetales en bandeja, rocía con aceite y limón.',
             'Hornea a 180°C por 15-20 minutos hasta que el salmón esté cocido.'
         ]
+    },
+    {
+        'id': 4,
+        'title': 'Tostadas integrales con aguacate y huevo',
+        'description': 'Desayuno rico en grasas saludables y proteína.',
+        'ingredients': [
+            '2 rebanadas pan integral',
+            '1/2 aguacate',
+            '2 huevos',
+            'Sal y pimienta'
+        ],
+        'steps': [
+            'Tostar el pan, aplastar el aguacate sobre las tostadas.',
+            'Hacer huevos a la plancha o escalfados y colocar encima.'
+        ]
+    },
+    {
+        'id': 5,
+        'title': 'Batido proteico de frutos rojos',
+        'description': 'Merienda rápida para recuperación muscular.',
+        'ingredients': [
+            '1 scoop proteína',
+            '150 g frutos rojos congelados',
+            '250 ml leche o bebida vegetal',
+            '1 cucharada avena'
+        ],
+        'steps': [
+            'Batir todos los ingredientes hasta obtener textura homogénea.',
+            'Consumir después del entrenamiento.'
+        ]
+    },
+    {
+        'id': 6,
+        'title': 'Salteado de garbanzos y espinacas',
+        'description': 'Plato vegetariano alto en fibra y proteína vegetal.',
+        'ingredients': [
+            '200 g garbanzos cocidos',
+            '100 g espinacas',
+            'Ajo, cebolla, pimentón',
+            'Aceite de oliva'
+        ],
+        'steps': [
+            'Saltear ajo y cebolla, añadir garbanzos y especias.',
+            'Agregar espinacas al final y cocinar 2 minutos.'
+        ]
     }
 ]
 # ...existing code...
 
+@app.route('/rutina')
+def rutina():
+    """Muestra rutina personalizada con detalle, dieta y enlaces a recetas.
+    Ahora usa género, peso, altura, edad e IMC para decidir objetivo y macros."""
+    user = session.get('user')
+    if not user:
+        flash('Debes completar el formulario primero.')
+        return redirect(url_for('formulario'))
+
+    # Extraer datos
+    peso = float(user.get('peso', 0))
+    altura_m = float(user.get('altura', 0))
+    altura_cm = altura_m * 100
+    edad = int(user.get('edad', 0))
+    genero = user.get('genero', 'masculino').lower()
+    imc = float(user.get('imc', 0))
+    # Recalcular TMB (Harris-Benedict) para precisión local
+    if genero == 'masculino':
+        tmb = 88.362 + (13.397 * peso) + (4.799 * altura_cm) - (5.677 * edad)
+    else:
+        tmb = 447.593 + (9.247 * peso) + (3.098 * altura_cm) - (4.330 * edad)
+    tmb = round(tmb, 2)
+
+    # Decidir objetivo según IMC
+    if imc < 18.5:
+        objetivo = 'ganar'      # aumento de masa
+        delta_cal = 400
+        prot_per_kg = 1.8
+    elif imc < 25:
+        objetivo = 'mantener'   # mantenimiento
+        delta_cal = 0
+        prot_per_kg = 1.6
+    else:
+        objetivo = 'perder'     # pérdida de grasa
+        delta_cal = -500
+        prot_per_kg = 2.0
+
+    # Estimar calorías de mantenimiento actuales (si el formulario ya calculó, úsalo)
+    mantenimiento = user.get('calorias') or round(tmb * 1.55, 2)
+    calorias_obj = max(1200, round(mantenimiento + delta_cal, 0))  # limitar mínimo seguro
+
+    # Macros: proteína en g por kg, grasas 25% calorías, resto carbohidratos
+    prot_g = round(prot_per_kg * peso, 1)
+    prot_kcal = prot_g * 4
+    fat_kcal = round(calorias_obj * 0.25, 0)
+    fat_g = round(fat_kcal / 9, 1)
+    carb_kcal = round(calorias_obj - (prot_kcal + fat_kcal), 0)
+    carb_g = round(carb_kcal / 4, 1)
+
+    # Rutina semanal adaptada por género y objetivo
+    if genero == 'masculino':
+        fuerza_focus = 'Fuerza con énfasis en hipertrofia y progresión de cargas'
+        cardio_focus = 'Cardio moderado/intervalado'
+        plan = [
+            {'dia': 'Lunes', 'actividad': 'Fuerza — Pecho/Tríceps (4 ejercicios, 3-4x8-12)'},
+            {'dia': 'Martes', 'actividad': 'Cardio: Intervalos 20-25 min'},
+            {'dia': 'Miércoles', 'actividad': 'Fuerza — Espalda/Bíceps (4 ejercicios, 3-4x8-12)'},
+            {'dia': 'Jueves', 'actividad': 'Piernas y core (4 ejercicios, 3x8-12)'},
+            {'dia': 'Viernes', 'actividad': 'Full body ligero + movilidad'},
+            {'dia': 'Sábado', 'actividad': 'Actividad recreativa o cardio suave'},
+            {'dia': 'Domingo', 'actividad': 'Descanso activo'}
+        ]
+    else:
+        fuerza_focus = 'Entrenamiento de resistencia funcional y tonificación'
+        cardio_focus = 'Cardio moderado y trabajo de movilidad'
+        plan = [
+            {'dia': 'Lunes', 'actividad': 'Fuerza — Tren inferior + glúteos (4x8-12)'},
+            {'dia': 'Martes', 'actividad': 'Cardio moderado 30 min + movilidad'},
+            {'dia': 'Miércoles', 'activity': 'Fuerza — Tren superior (3-4 ejercicios)'},
+            {'dia': 'Jueves', 'actividad': 'Pilates / Core y movilidad'},
+            {'dia': 'Viernes', 'actividad': 'Circuito full body (condición + fuerza)'},
+            {'dia': 'Sábado', 'actividad': 'Actividad recreativa ligera'},
+            {'dia': 'Domingo', 'actividad': 'Descanso activo'}
+        ]
+
+    # Dieta de ejemplo con macros calculadas
+    dieta = {
+        'objetivo': {
+            'ganar': 'Superávit calórico moderado (+300-500 kcal)',
+            'mantener': 'Calorías de mantenimiento',
+            'perder': 'Déficit moderado (-300-600 kcal)'
+        }[objetivo],
+        'calorias_objetivo': calorias_obj,
+        'macros': {
+            'proteina_g': prot_g,
+            'carbohidratos_g': carb_g,
+            'grasas_g': fat_g
+        },
+        'ejemplo': {
+            'desayuno': 'Avena con leche, fruta y proteína (ver receta 1 o 4)',
+            'almuerzo': 'Fuente de proteína + carbohidrato complejo + vegetales (receta 2 o 3)',
+            'merienda': 'Batido proteico o yogur con frutos secos (receta 5)',
+            'cena': 'Pescado/Pollo/Legumbres con verduras (receta 3 o 6)'
+        }
+    }
+
+    rutina_detalle = {
+        'descripcion': f'{fuerza_focus} — objetivo: {objetivo} — TMB estimado: {tmb} kcal/día',
+        'plan_semanal': plan,
+        'dieta': dieta
+    }
+
+    return render_template('rutina.html', user=user, rutina=rutina_detalle)
+# ...existing code...
 @app.route('/')
 def inicio():
     """Página de inicio con información."""
     return render_template('info.html')
-
-@app.route('/api')
-def apis():
-    
 
 @app.route('/formulario')
 def formulario():
@@ -103,8 +367,10 @@ def resultado():
         session['error'] = 'Error: Los valores deben ser mayores a 0.'
         return redirect(url_for('formulario'))
     
+    # Calcular IMC
     imc = round(peso / (altura ** 2), 2)
     
+    # Clasificar IMC
     if imc < 18.5:
         clasificacion = 'Bajo peso'
         recomendacion = 'Aumenta tu ingesta calórica de forma saludable.'
@@ -118,6 +384,7 @@ def resultado():
         clasificacion = 'Obesidad'
         recomendacion = 'Consulta a un profesional de salud.'
     
+    # Calcular TMB (Harris-Benedict)
     if genero == 'masculino':
         tmb = 88.362 + (13.397 * peso) + (4.799 * (altura * 100)) - (5.677 * edad)
     else:
@@ -126,6 +393,7 @@ def resultado():
     tmb = round(tmb, 2)
     calorias = round(tmb * 1.55, 2)
     
+    # Guardar en sesión
     session['user'] = {
         'nombre': nombre,
         'apellido': apellido,
@@ -177,83 +445,6 @@ def login():
     
     flash('Correo o contraseña incorrectos.')
     return render_template('login.html')
-
-@app.route('/rutina')
-def rutina():
-    """Muestra rutina personalizada con detalle, dieta y enlaces a recetas."""
-    user = session.get('user')
-    if not user:
-        flash('Debes completar el formulario primero.')
-        return redirect(url_for('formulario'))
-
-    clas = user.get('clasificacion', '').lower()
-    if 'bajo' in clas:
-        rutina_detalle = {
-            'descripcion': 'Enfocado en ganancia muscular y aumento calórico',
-            'plan_semanal': [
-                {'dia': 'Lunes', 'actividad': 'Fuerza — Tren superior (4 ejercicios, 3x8-12)'},
-                {'dia': 'Martes', 'actividad': 'Cardio ligero 20-30 min'},
-                {'dia': 'Miércoles', 'actividad': 'Fuerza — Tren inferior (4 ejercicios, 3x8-12)'},
-                {'dia': 'Jueves', 'actividad': 'Descanso activo: caminata 30 min'},
-                {'dia': 'Viernes', 'actividad': 'Fuerza — Full body (3 series por ejercicio)'},
-                {'dia': 'Sábado', 'actividad': 'Cardio ligero o actividad recreativa'},
-                {'dia': 'Domingo', 'actividad': 'Descanso completo'}
-            ],
-            'dieta': {
-                'objetivo': 'Superávit calórico moderado (+300-500 kcal)',
-                'ejemplo': {
-                    'desayuno': 'Avena con leche, plátano y frutos secos (ver receta 1)',
-                    'media_mañana': 'Yogur griego con miel',
-                    'almuerzo': 'Quinoa con pollo y verduras (ver receta 2)',
-                    'merienda': 'Batido proteico con fruta',
-                    'cena': 'Pescado o pollo con verduras y patata'
-                }
-            }
-        }
-    elif 'normal' in clas:
-        rutina_detalle = {
-            'descripcion': 'Mantener condición y composición corporal',
-            'plan_semanal': [
-                {'dia': 'Lunes', 'actividad': 'Fuerza — Full body (3x8-12)'},
-                {'dia': 'Martes', 'actividad': 'Cardio moderado 30-40 min'},
-                {'dia': 'Miércoles', 'activity': 'Movilidad y core'},
-                {'dia': 'Jueves', 'actividad': 'Fuerza — Enfoque en técnica'},
-                {'dia': 'Viernes', 'actividad': 'Cardio intervalado 20-30 min'},
-                {'dia': 'Sábado', 'actividad': 'Actividad recreativa'},
-                {'dia': 'Domingo', 'actividad': 'Descanso activo'}
-            ],
-            'dieta': {
-                'objetivo': 'Mantener calorías de mantenimiento',
-                'ejemplo': {
-                    'desayuno': 'Tostadas integrales con aguacate y huevo',
-                    'almuerzo': 'Quinoa con pollo (ver receta 2)',
-                    'cena': 'Salmón al horno con vegetales (ver receta 3)'
-                }
-            }
-        }
-    else:
-        rutina_detalle = {
-            'descripcion': 'Reducir grasa corporal con déficit moderado y actividad cardiovascular',
-            'plan_semanal': [
-                {'dia': 'Lunes', 'actividad': 'Cardio 30-40 min + core'},
-                {'dia': 'Martes', 'actividad': 'Fuerza — Enfoque en grandes grupos musculares (3x8-12)'},
-                {'dia': 'Miércoles', 'actividad': 'HIIT 20-25 min'},
-                {'dia': 'Jueves', 'actividad': 'Fuerza — Técnica y movilidad'},
-                {'dia': 'Viernes', 'actividad': 'Cardio moderado 40 min'},
-                {'dia': 'Sábado', 'actividad': 'Actividad recreativa ligera'},
-                {'dia': 'Domingo', 'actividad': 'Descanso'}
-            ],
-            'dieta': {
-                'objetivo': 'Déficit calórico moderado (-300-600 kcal), alta proteína',
-                'ejemplo': {
-'desayuno': 'Omelette con verduras',
-                    'almuerzo': 'Ensalada grande con proteína magra (pollo o pescado)',
-                    'cena': 'Verduras asadas con porción de quinoa'
-                }
-            }
-        }
-
-    return render_template('rutina.html', user=user, rutina=rutina_detalle)
 
 @app.route('/perfil')
 def perfil():

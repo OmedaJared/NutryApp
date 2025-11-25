@@ -35,7 +35,7 @@
                     <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('gct') }}">GCT</a></li>
                     <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('macros') }}">Macros</a></li>
                     <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('peso_ideal') }}">Peso Ideal</a></li>
-                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('info_de_alimentos') }}">info_de_alimentos</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('nutrientes') }}">🥕 Nutrientes</a></li>
                 </ul>
             </div>
         </div>
@@ -44,14 +44,14 @@
     <main>
         <div class="container my-5">
             {% with messages = get_flashed_messages() %}
-            {% if messages %}
+              {% if messages %}
                 {% for m in messages %}
-                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                  <div class="alert alert-info alert-dismissible fade show" role="alert">
                     {{ m }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
+                  </div>
                 {% endfor %}
-            {% endif %}
+              {% endif %}
             {% endwith %}
             {% block contenido %}{% endblock %}
         </div>
