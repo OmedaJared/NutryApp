@@ -4,6 +4,9 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 app = Flask(__name__)
 app.secret_key = 'cambia_esto_en_produccion'
 
+api_key="tN2XZsdySpg5RvS75AJNOLrDHjPbny4W64vfXF3N"
+API_URL="https://api.nal.usda.gov/fdc/v1/foods/search"
+
 def _get_first(form, *keys, default=''):
     """Retorna el primer valor no vacío del formulario."""
     for k in keys:
@@ -67,6 +70,10 @@ RECIPES = [
 def inicio():
     """Página de inicio con información."""
     return render_template('info.html')
+
+@app.route('/api')
+def apis():
+    
 
 @app.route('/formulario')
 def formulario():
