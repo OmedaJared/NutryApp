@@ -14,7 +14,6 @@
                 </div>
             {% endif %}
 
-            <!-- Formulario de búsqueda -->
             <form action="{{ url_for('nutrientes') }}" method="post" class="mb-4">
                 <div class="input-group input-group-lg">
                     <input class="form-control" type="text" name="termino" placeholder="Busca: manzana, pollo, arroz, etc." required>
@@ -22,7 +21,6 @@
                 </div>
             </form>
 
-            <!-- Resultados -->
             {% if alimentos %}
                 <h4 class="brand mt-4">Resultados de búsqueda</h4>
                 <p class="accent">Se encontraron {{ alimentos | length }} alimento(s)</p>
@@ -30,13 +28,13 @@
                 <div class="accordion" id="accordionNutrientes">
                     {% for idx, alimento in enumerate(alimentos) %}
                     <div class="accordion-item">
-                        <h2 class="accordion-header" id="heading{{ idx }}">
-                            <button class="accordion-button {% if idx != 0 %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ idx }}">
+                        <h2 class="accordion-header" id="heading{{ loop.index }}">
+                            <button class="accordion-button {% if idx != 0 %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}">
                                 <strong>{{ alimento.description }}</strong>
                                 <span class="ms-2 badge bg-info">{{ alimento.brand }}</span>
                             </button>
                         </h2>
-                        <div id="collapse{{ idx }}" class="accordion-collapse collapse {% if idx == 0 %}show{% endif %}" data-bs-parent="#accordionNutrientes">
+                        <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {% if idx == 0 %}show{% endif %}" data-bs-parent="#accordionNutrientes">
                             <div class="accordion-body">
                                 <p><strong>ID USDA:</strong> {{ alimento.fdcId }}</p>
                                 <p><strong>Marca/Origen:</strong> {{ alimento.brand }}</p>
@@ -74,7 +72,6 @@
                 </div>
             {% endif %}
 
-            <!-- Mensaje cuando no hay resultados aún -->
             {% if not alimentos and not error %}
                 <div class="alert alert-info" role="alert">
                     <p>🔍 <strong>Cómo usar:</strong></p>

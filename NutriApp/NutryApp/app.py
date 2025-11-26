@@ -4,13 +4,12 @@ import requests
 API_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
 API_KEY = "tN2XZsdySpg5RvS75AJNOLrDHJPbny4W64vfX3N"
 
-# ...existing code...
 app = Flask(__name__)
 app.secret_key = 'cambia_esto_en_produccion'
 
-# **DICCIONARIO DE RECETAS — AGREGAR AQUÍ**
 RECIPES = [
     {
+        
         'id': 1,
         'title': 'Bowl de avena con frutas y frutos secos',
         'description': 'Desayuno energético con avena, leche, plátano, frutos secos y miel.',
@@ -219,8 +218,6 @@ RECIPES = [
     }
 ]
 
-# ...existing code (rutas)...
-
 @app.route('/')
 def inicio():
     return render_template('info.html')
@@ -252,7 +249,6 @@ def resultado():
             flash('❌ Edad, peso y altura deben ser mayores a 0.', 'danger')
             return redirect(url_for('formulario'))
         
-        # Calcular IMC
         imc = peso / (altura ** 2)
         imc = round(imc, 2)
         
@@ -269,7 +265,6 @@ def resultado():
             clasificacion = 'Obesidad'
             recomendacion = 'Consulta con un profesional de la salud.'
         
-        # Calcular TMB (Harris-Benedict)
         altura_cm = altura * 100
         if genero == 'masculino':
             tmb = 88.362 + (13.397 * peso) + (4.799 * altura_cm) - (5.677 * edad)
@@ -279,7 +274,6 @@ def resultado():
         tmb = round(tmb, 2)
         calorias = round(tmb * 1.55, 2)
         
-        # Recopilar objetivos y preferencias
         objetivos = request.form.getlist('objetivos')
         alergias = request.form.get('alergias', '').strip()
         intolerancias = request.form.get('intolerancias', '').strip()
@@ -287,7 +281,6 @@ def resultado():
         alimentos_no_gustan = request.form.get('alimentos_no_gustan', '').strip()
         experiencia = request.form.get('experiencia', 'principiante').strip()
         
-        # **GUARDAR EN SESIÓN — ESTO ES CRUCIAL**
         session['user'] = {
             'nombre': nombre,
             'apellido': apellido,
@@ -295,7 +288,7 @@ def resultado():
             'peso': peso,
             'altura': altura,
             'correo_electronico': correo_electronico,
-            'contraseña': contraseña,  # En producción: usar hash
+            'contraseña': contraseña,
             'genero': genero,
             'imc': imc,
             'clasificacion': clasificacion,
@@ -309,15 +302,15 @@ def resultado():
             'alimentos_no_gustan': alimentos_no_gustan,
             'experiencia': experiencia
         }
-        session.modified = True  # **FUERZA GUARDAR LA SESIÓN**
+        session.modified = True  
         
         flash(f'✅ ¡Bienvenido, {nombre}! Datos guardados correctamente.', 'success')
         return render_template('formulario.html', 
-                             imc=imc,
-                             clasificacion=clasificacion,
-                             recomendacion=recomendacion,
-                             calorias=calorias,
-                             **session['user'])
+                                imc=imc,
+                                clasificacion=clasificacion,
+                                recomendacion=recomendacion,
+                                calorias=calorias,
+                                **session['user'])
     
     except (ValueError, TypeError) as e:
         flash(f'❌ Error: por favor verifica que todos los campos sean válidos. ({str(e)})', 'danger')
@@ -330,16 +323,14 @@ def login():
         correo = request.form.get('correo', '').strip()
         contraseña = request.form.get('contraseña', '')
         
-        # Obtener datos guardados en sesión
         user = session.get('user', {})
         
-        # Validar credenciales
         if not user:
             flash('❌ No hay datos registrados. Por favor completa el formulario primero.', 'warning')
             return redirect(url_for('formulario'))
         
         if user.get('correo_electronico') == correo and user.get('contraseña') == contraseña:
-            # Credenciales correctas
+
             session['authenticated'] = True
             session.modified = True
             flash(f'✅ ¡Bienvenido, {user.get("nombre")}!', 'success')
@@ -358,7 +349,6 @@ def rutina():
         flash('❌ Primero debes llenar el formulario o iniciar sesión.', 'warning')
         return redirect(url_for('formulario'))
     
-    # Extraer datos
     peso = float(user.get('peso', 0))
     altura_m = float(user.get('altura', 0))
     altura_cm = altura_m * 100
@@ -367,7 +357,7 @@ def rutina():
     imc = float(user.get('imc', 0))
     tmb = float(user.get('tmb', 0))
     
-    # Decidir objetivo según IMC
+
     if imc < 18.5:
         objetivo = 'ganar'
         delta_cal = 500
@@ -381,17 +371,14 @@ def rutina():
         delta_cal = -500
         prot_per_kg = 2.0
     
-    # Calorías objetivo
     mantenimiento = user.get('calorias') or round(tmb * 1.55, 2)
     calorias_obj = max(1200, round(mantenimiento + delta_cal, 0))
     
-    # Macros
     prot_g = round(prot_per_kg * peso, 1)
     prot_kcal = prot_g * 4
     fat_g = round((calorias_obj * 0.25) / 9, 1)
     carb_g = round((calorias_obj - prot_kcal - (fat_g * 9)) / 4, 1)
     
-    # Rutina semanal
     if genero == 'masculino':
         plan = [
             {'dia': 'Lunes', 'actividad': 'Fuerza — Pecho/Tríceps (4 ejercicios, 3-4x8-12)'},
@@ -413,7 +400,6 @@ def rutina():
             {'dia': 'Domingo', 'actividad': 'Descanso activo'}
         ]
     
-    # Dieta
     dieta = {
         'objetivo': {
             'ganar': 'Superávit calórico moderado (+300-500 kcal)',
@@ -593,19 +579,16 @@ def nutrientes():
             return render_template('nutrientes.html', alimento=alimento, alimentos=alimentos, error=error)
         
         try:
-            # Parámetros para la API
             params = {
                 'query': termino_busqueda,
                 'pageSize': 10,
                 'api_key': API_KEY
             }
             
-            # Realizar petición a USDA
             response = requests.get(API_URL, params=params, timeout=10)
             response.raise_for_status()
             data = response.json()
             
-            # Procesar resultados
             if 'foods' in data and len(data['foods']) > 0:
                 alimentos = []
                 for food in data['foods']:
@@ -616,14 +599,12 @@ def nutrientes():
                         'nutrientes': {}
                     }
                     
-                    # Extraer nutrientes principales
                     if 'foodNutrients' in food:
                         for nutrient in food['foodNutrients']:
                             nutrient_name = nutrient.get('nutrientName', '').lower()
                             nutrient_value = nutrient.get('value', 0)
                             unit = nutrient.get('unitName', '')
                             
-                            # Mapear nutrientes importantes
                             if 'energy' in nutrient_name and 'kcal' in unit.lower():
                                 food_data['nutrientes']['Calorías'] = f"{nutrient_value:.1f} {unit}"
                             elif 'protein' in nutrient_name:
@@ -670,8 +651,6 @@ def clear():
     session.clear()
     flash('🗑️ Datos borrados.', 'info')
     return redirect(url_for('formulario'))
-
-# ...existing code (RECIPES dictionary, etc.)...
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,13 +1,11 @@
-/* ...existing code... */
 :root{
     --bg: #65e065;
-    --primary: #1aaa2f; /* bootstrap blue */
-    --accent: #3cf218; /* green */
+    --primary: #1aaa2f; 
+    --accent: #3cf218; 
     --muted: #6c757d;
     --texto: #0b2e10;
 }
 
-/* ...existing code... */
 html, body {
     height: 100%;
     background: linear-gradient(180deg, #0ce70c 0%, #23a52b 100%);
@@ -15,7 +13,6 @@ html, body {
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-/* card-soft keep light */
 .card-soft {
     background: #15f349;
     border-radius: 12px;
@@ -24,7 +21,6 @@ html, body {
     color: var(--texto);
 }
 
-/* buttons */
 .btn-brand {
     background-color: var(--primary);
     color: #41f568;
