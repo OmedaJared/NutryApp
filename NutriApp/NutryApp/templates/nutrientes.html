@@ -3,94 +3,89 @@
 
 {% block contenido %}
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card shadow-sm border-0">
-            <div class="card-body p-5">
-                <h2 class="card-title brand mb-3">🥕 Buscador de Nutrientes</h2>
-                <p class="accent">Busca un alimento y obtén información detallada sobre sus nutrientes.</p>
+    <div class="col-lg-10">
+        <div class="card-soft">
+            <h2 class="card-title brand mb-3">🥕 Buscador de Nutrientes USDA</h2>
+            <p class="accent">Busca un alimento y obtén información detallada sobre sus nutrientes.</p>
 
-                {% if error %}
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong>Error:</strong> {{ error }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                {% endif %}
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+            {% endif %}
 
-                <form action="{{ url_for('nutrientes') }}" method="post" class="mb-4">
-                    <div class="input-group input-group-lg">
-                        <input 
-                            class="form-control" 
-                            type="text" 
-                            name="alimento" 
-                            placeholder="Ej: manzana, pollo, arroz, pan integral..."
-                            value="{{ alimento or '' }}"
-                            required>
-                        <button class="btn btn-primary" type="submit">🔍 Buscar</button>
-                    </div>
-                    <small class="text-muted d-block mt-2">Puedes escribir en español. Ej: plátano, zanahoria, huevo.</small>
-                </form>
+            <!-- Formulario de búsqueda -->
+            <form action="{{ url_for('nutrientes') }}" method="post" class="mb-4">
+                <div class="input-group input-group-lg">
+                    <input class="form-control" type="text" name="termino" placeholder="Busca: manzana, pollo, arroz, etc." required>
+                    <button class="btn btn-primary" type="submit">🔍 Buscar</button>
+                </div>
+            </form>
 
-                {% if alimentos %}
-                    <h3 class="brand mb-3">Resultados encontrados:</h3>
-                    
-                    {% if alimentos|length == 0 %}
-                        <div class="alert alert-warning" role="alert">
-                            No se encontraron resultados para "<strong>{{ alimento }}</strong>". 
-                            Intenta con otro término.
+            <!-- Resultados -->
+            {% if alimentos %}
+                <h4 class="brand mt-4">Resultados de búsqueda</h4>
+                <p class="accent">Se encontraron {{ alimentos | length }} alimento(s)</p>
+
+                <div class="accordion" id="accordionNutrientes">
+                    {% for idx, alimento in enumerate(alimentos) %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{ idx }}">
+                            <button class="accordion-button {% if idx != 0 %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ idx }}">
+                                <strong>{{ alimento.description }}</strong>
+                                <span class="ms-2 badge bg-info">{{ alimento.brand }}</span>
+                            </button>
+                        </h2>
+                        <div id="collapse{{ idx }}" class="accordion-collapse collapse {% if idx == 0 %}show{% endif %}" data-bs-parent="#accordionNutrientes">
+                            <div class="accordion-body">
+                                <p><strong>ID USDA:</strong> {{ alimento.fdcId }}</p>
+                                <p><strong>Marca/Origen:</strong> {{ alimento.brand }}</p>
+                                
+                                <h6 class="accent mt-3">Nutrientes principales (por 100g):</h6>
+                                {% if alimento.nutrientes %}
+                                    <table class="table table-sm table-striped">
+                                        <thead style="background-color: var(--primary); color: white;">
+                                            <tr>
+                                                <th>Nutriente</th>
+                                                <th>Cantidad</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for nutrient, valor in alimento.nutrientes.items() %}
+                                            <tr>
+                                                <td><strong>{{ nutrient }}</strong></td>
+                                                <td>{{ valor }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                {% else %}
+                                    <p class="muted">No hay información de nutrientes disponible.</p>
+                                {% endif %}
+                            </div>
                         </div>
-                    {% else %}
-                        <div class="row">
-                            {% for item in alimentos %}
-                                <div class="col-md-6 mb-3">
-                                    <div class="card border-0 shadow-sm">
-                                        <div class="card-body">
-                                            <h5 class="card-title">{{ item.description }}</h5>
-                                            <button 
-                                                class="btn btn-outline-primary btn-sm" 
-                                                type="button" 
-                                                data-bs-toggle="collapse" 
-                                                data-bs-target="#nutrientes-{{ loop.index }}">
-                                                Ver nutrientes →
-                                            </button>
-                                            
-                                            <div class="collapse mt-3" id="nutrientes-{{ loop.index }}">
-                                                <div class="card card-body border-0" style="background-color: rgba(0,0,0,0.02);">
-                                                    {% if item.nutrients %}
-                                                        <table class="table table-sm mb-0">
-                                                            <tbody>
-                                                                {% for nutrient in item.nutrients %}
-                                                                    <tr>
-                                                                        <td><strong>{{ nutrient.name }}</strong></td>
-                                                                        <td class="text-end">{{ nutrient.value }} {{ nutrient.unitName }}</td>
-                                                                    </tr>
-                                                                {% endfor %}
-                                                            </tbody>
-                                                        </table>
-                                                    {% else %}
-                                                        <p class="text-muted mb-0">No hay información de nutrientes disponible.</p>
-                                                    {% endif %}
-                                                    
-                                                    {% if item.foodCategory %}
-                                                        <hr class="my-2">
-                                                        <small class="text-muted"><strong>Categoría:</strong> {{ item.foodCategory }}</small>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                {% endif %}
-
-                {% if not alimentos and alimento %}
-                    <div class="alert alert-info" role="alert">
-                        <strong>Sin resultados:</strong> No se encontró información para "{{ alimento }}". 
-                        Intenta con otro alimento o verifica la ortografía.
                     </div>
-                {% endif %}
-            </div>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-4">
+                    <a class="btn btn-outline-primary" href="{{ url_for('nutrientes') }}">🔄 Nueva búsqueda</a>
+                    <a class="btn btn-outline-secondary" href="{{ url_for('recetas') }}">🍳 Ver recetas</a>
+                </div>
+            {% endif %}
+
+            <!-- Mensaje cuando no hay resultados aún -->
+            {% if not alimentos and not error %}
+                <div class="alert alert-info" role="alert">
+                    <p>🔍 <strong>Cómo usar:</strong></p>
+                    <ul>
+                        <li>Escribe el nombre de un alimento en español (ej: manzana, pollo, pan)</li>
+                        <li>Haz clic en "Buscar"</li>
+                        <li>Expande los resultados para ver nutrientes detallados</li>
+                        <li>Información por 100g de alimento</li>
+                    </ul>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

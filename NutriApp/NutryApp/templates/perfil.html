@@ -5,22 +5,57 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card-soft">
-            <h2 class="brand">Información ingresada</h2>
-            <p><strong>Nombre:</strong> {{ user.nombre }} {{ user.apellido }}</p>
-            <p><strong>Edad:</strong> {{ user.edad }}</p>
-            <p><strong>Peso:</strong> {{ user.peso }} kg</p>
-            <p><strong>Altura:</strong> {{ user.altura }} m</p>
-            <p><strong>Género:</strong> {{ user.genero }}</p>
-            <p><strong>Correo:</strong> {{ user.correo_electronico }}</p>
-            <p><strong>IMC:</strong> {{ user.imc }}</p>
-            <p><strong>Clasificación:</strong> {{ user.clasificacion }}</p>
-            <p><strong>Calorías mantenimiento:</strong> {{ user.calorias }} kcal</p>
+            <h2 class="brand mb-4">👤 Mi Perfil</h2>
 
-            <nav style="margin-top:15px;">
-                <a class="btn-brand" href="{{ url_for('rutina') }}">Ver rutina detallada</a>
-                <a class="btn btn-outline-secondary" href="{{ url_for('recetas') }}" style="margin-left:10px;">Recetas</a>
-                <a class="btn btn-danger" href="{{ url_for('logout') }}" style="margin-left:10px;">Cerrar sesión</a>
-            </nav>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h5 class="accent">Información Personal</h5>
+                    <p><strong>Nombre:</strong> {{ user.nombre }} {{ user.apellido }}</p>
+                    <p><strong>Correo:</strong> {{ user.correo_electronico }}</p>
+                    <p><strong>Edad:</strong> {{ user.edad }} años</p>
+                    <p><strong>Género:</strong> {{ user.genero }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="accent">Medidas y Salud</h5>
+                    <p><strong>Peso:</strong> {{ user.peso }} kg</p>
+                    <p><strong>Altura:</strong> {{ user.altura }} m</p>
+                    <p><strong>IMC:</strong> {{ user.imc }}</p>
+                    <p><strong>Clasificación:</strong> <span class="brand">{{ user.clasificacion }}</span></p>
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h5 class="accent">Objetivos</h5>
+                    <p>{{ user.objetivos | join(', ') or 'No especificado' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="accent">Experiencia en Cocina</h5>
+                    <p>{{ user.experiencia }}</p>
+                </div>
+            </div>
+
+            <hr>
+
+            <h5 class="accent">Restricciones y Preferencias</h5>
+            <p><strong>Alergias:</strong> {{ user.alergias or 'Ninguna' }}</p>
+            <p><strong>Intolerancias:</strong> {{ user.intolerancias or 'Ninguna' }}</p>
+            <p><strong>Dieta específica:</strong> {{ user.dieta_especifica or 'N/A' }}</p>
+            <p><strong>Alimentos que no te gustan:</strong> {{ user.alimentos_no_gustan or 'Ninguno' }}</p>
+
+            <hr>
+
+            <h5 class="accent">Nutrición Estimada</h5>
+            <p><strong>Calorías de mantenimiento:</strong> {{ user.calorias }} kcal/día</p>
+
+            <!-- Botones -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
+                <a class="btn btn-primary" href="{{ url_for('rutina') }}">💪 Ver mi rutina</a>
+                <a class="btn btn-outline-secondary" href="{{ url_for('formulario') }}">✏️ Editar datos</a>
+                <a class="btn btn-danger" href="{{ url_for('logout') }}">🚪 Cerrar sesión</a>
+            </div>
         </div>
     </div>
 </div>

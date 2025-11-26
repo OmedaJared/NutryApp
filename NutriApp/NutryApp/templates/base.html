@@ -30,12 +30,22 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('formulario') }}">Formulario</a></li>
-                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('tmb') }}">TMB</a></li>
-                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('gct') }}">GCT</a></li>
-                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('macros') }}">Macros</a></li>
-                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('peso_ideal') }}">Peso Ideal</a></li>
-                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('nutrientes') }}">🥕 Nutrientes</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('formulario') }}">📝 Formulario</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('recetas') }}">🍳 Recetas</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('educacion') }}">📚 Educación</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-white" href="#" id="calcNav" role="button" data-bs-toggle="dropdown">
+                            🧮 Calculadoras
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="calcNav">
+                            <li><a class="dropdown-item" href="{{ url_for('tmb') }}">TMB</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('gct') }}">GCT</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('macros') }}">Macros</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('peso_ideal') }}">Peso Ideal</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('nutrientes') }}">🥕 Nutrientes</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link text-white" href="{{ url_for('login') }}">🔐 Login</a></li>
                 </ul>
             </div>
         </div>

@@ -3,44 +3,88 @@
 
 {% block contenido %}
 <div class="row justify-content-center">
-    <div class="col-lg-9">
+    <div class="col-lg-10">
         <div class="card-soft">
-            <h2 class="brand">Rutina personalizada</h2>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="brand">💪 Rutina Personalizada</h2>
+                <span class="accent">Bienvenido, {{ user.nombre }}!</span>
+            </div>
+
+            <!-- Resumen personal -->
+            <div class="alert alert-light border border-2" style="border-color: var(--primary);">
+                <h5 class="brand">📊 Tu información</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Edad:</strong> {{ user.edad }} años</p>
+                        <p><strong>Peso:</strong> {{ user.peso }} kg</p>
+                        <p><strong>Altura:</strong> {{ user.altura }} m</p>
+                        <p><strong>IMC:</strong> {{ user.imc }} ({{ user.clasificacion }})</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Género:</strong> {{ user.genero }}</p>
+                        <p><strong>Objetivos:</strong> {{ user.objetivos | join(', ') or 'No especificado' }}</p>
+                        <p><strong>Experiencia:</strong> {{ user.experiencia }}</p>
+                        <p><strong>Alergias:</strong> {{ user.alergias or 'Ninguna' }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plan de rutina semanal -->
+            <h4 class="brand mt-4">📅 Plan Semanal</h4>
             <p class="accent">{{ rutina.descripcion }}</p>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead style="background-color: var(--primary); color: white;">
+                        <tr>
+                            <th>Día</th>
+                            <th>Actividad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dia in rutina.plan_semanal %}
+                        <tr>
+                            <td><strong>{{ dia.dia }}</strong></td>
+                            <td>{{ dia.actividad }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
 
-            <h4 class="mt-3">Plan semanal</h4>
+            <!-- Macros y nutrición -->
+            <h4 class="brand mt-4">🥗 Plan de Nutrición</h4>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="alert alert-info">
+                        <p><strong>Objetivo:</strong> {{ rutina.dieta.objetivo }}</p>
+                        <p><strong>Calorías objetivo:</strong> {{ rutina.dieta.calorias_objetivo }} kcal/día</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="alert alert-success">
+                        <p><strong>Proteína:</strong> {{ rutina.dieta.macros.proteina_g }} g/día</p>
+                        <p><strong>Carbohidratos:</strong> {{ rutina.dieta.macros.carbohidratos_g }} g/día</p>
+                        <p><strong>Grasas:</strong> {{ rutina.dieta.macros.grasas_g }} g/día</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ejemplo de comidas -->
+            <h5 class="accent">Ejemplo de comidas diarias:</h5>
             <ul>
-                {% for dia in rutina.plan_semanal %}
-                    <li><strong>{{ dia.dia }}:</strong> {{ dia.actividad or dia.activity }}</li>
-                {% endfor %}
+                <li><strong>Desayuno:</strong> {{ rutina.dieta.ejemplo.desayuno }}</li>
+                <li><strong>Almuerzo:</strong> {{ rutina.dieta.ejemplo.almuerzo }}</li>
+                <li><strong>Merienda:</strong> {{ rutina.dieta.ejemplo.merienda }}</li>
+                <li><strong>Cena:</strong> {{ rutina.dieta.ejemplo.cena }}</li>
             </ul>
 
-            <h4 class="mt-3">Ejemplo de sesión de fuerza (día de tren superior)</h4>
-            <ol>
-                <li>Calentamiento: 8-10 min bici o trote suave + movilidad articular.</li>
-                <li>Press de banca: 4 series de 8-12 repeticiones — 90s descanso.</li>
-                <li>Remo con mancuerna: 4x8-12 — 90s descanso.</li>
-                <li>Press militar con barra o mancuerna: 3x8-12.</li>
-                <li>Pájaros o face pulls: 3x12-15.</li>
-                <li>Core: Plank 3x45s.</li>
-                <li>Estiramiento final 5-7 min.</li>
-            </ol>
-
-            <h4 class="mt-3">Plan de dieta (objetivo: {{ rutina.dieta.objetivo }})</h4>
-            <p><strong>Ejemplo de comidas:</strong></p>
-            <ul>
-                {% for key, meal in rutina.dieta.ejemplo.items() %}
-                    <li><strong>{{ key | capitalize }}:</strong> {{ meal }}</li>
-                {% endfor %}
-            </ul>
-
-            <p class="mt-3">Para ver recetas y formas de preparación haz clic en <a href="{{ url_for('recetas') }}">Recetas</a>.</p>
-
-            <nav class="mt-4">
-                <a class="btn-brand" href="{{ url_for('perfil') }}">Ver mi perfil</a>
-                <a class="btn btn-outline-secondary" href="{{ url_for('recetas') }}" style="margin-left:10px;">Ver recetas</a>
-                <a class="btn btn-danger" href="{{ url_for('logout') }}" style="margin-left:10px;">Cerrar sesión</a>
-            </nav>
+            <!-- Botones de navegación -->
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
+                <a class="btn btn-success" href="{{ url_for('perfil') }}">👤 Ver perfil completo</a>
+                <a class="btn btn-outline-primary" href="{{ url_for('recetas') }}">🍳 Ver recetas recomendadas</a>
+                <a class="btn btn-outline-secondary" href="{{ url_for('formulario') }}">📝 Editar datos</a>
+                <a class="btn btn-danger" href="{{ url_for('logout') }}">🚪 Cerrar sesión</a>
+            </div>
         </div>
     </div>
 </div>

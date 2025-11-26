@@ -17,52 +17,120 @@
                 {% endif %}
 
                 <form id="datosForm" action="{{ url_for('resultado') }}" method="post">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                    <!-- Datos personales básicos -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
                             <label class="form-label">Nombre:</label>
                             <input class="form-control" type="text" name="nombre" value="{{ nombre or '' }}" required>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-6">
                             <label class="form-label">Apellido:</label>
                             <input class="form-control" type="text" name="apellido" value="{{ apellido or '' }}" required>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Edad (años):</label>
-                            <input class="form-control" type="number" name="edad" min="1" value="{{ edad or '' }}" required>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Email:</label>
+                            <input class="form-control" type="email" name="correo_electronico" value="{{ correo_electronico or '' }}" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Género:</label>
+                        <div class="col-md-6">
+                            <label class="form-label">Contraseña:</label>
+                            <input class="form-control" type="password" name="contraseña" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Edad:</label>
+                            <input class="form-control" type="number" name="edad" value="{{ edad or '' }}" min="1" max="120" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Sexo:</label>
                             <select class="form-select" name="genero" required>
+                                <option value="">Selecciona...</option>
                                 <option value="masculino" {% if genero == 'masculino' %}selected{% endif %}>Masculino</option>
                                 <option value="femenino" {% if genero == 'femenino' %}selected{% endif %}>Femenino</option>
+                                <option value="otro" {% if genero == 'otro' %}selected{% endif %}>Otro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Nivel de actividad:</label>
+                            <select class="form-select" name="actividad" required>
+                                <option value="">Selecciona...</option>
+                                <option value="sedentario">Sedentario</option>
+                                <option value="ligero">Ligero (1-3 días/semana)</option>
+                                <option value="moderado">Moderado (3-5 días/semana)</option>
+                                <option value="intenso">Intenso (6-7 días/semana)</option>
+                                <option value="muy_intenso">Muy intenso (2x por día)</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
                             <label class="form-label">Peso (kg):</label>
-                            <input class="form-control" type="number" step="0.1" name="peso" value="{{ peso or '' }}" required>
+                            <input class="form-control" type="number" name="peso" value="{{ peso or '' }}" step="0.1" min="20" max="300" required>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Altura (m):</label>
-                            <input class="form-control" type="number" step="0.01" name="altura" value="{{ altura or '' }}" required>
+                        <div class="col-md-6">
+                            <label class="form-label">Altura (metros):</label>
+                            <input class="form-control" type="number" name="altura" value="{{ altura or '' }}" step="0.01" min="1.0" max="2.5" placeholder="1.75" required>
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Correo Electrónico:</label>
-                        <input class="form-control" type="email" name="correo_electronico" value="{{ correo_electronico or '' }}" required>
+                    <hr>
+                    <h5>Objetivos</h5>
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" type="checkbox" name="objetivos" value="bajar_peso" id="obj1" {% if 'bajar_peso' in objetivos %}checked{% endif %}>
+                        <label class="form-check-label" for="obj1">Bajar de peso</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" type="checkbox" name="objetivos" value="aumentar_masa" id="obj2" {% if 'aumentar_masa' in objetivos %}checked{% endif %}>
+                        <label class="form-check-label" for="obj2">Aumentar masa muscular</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" type="checkbox" name="objetivos" value="mantener_peso" id="obj3" {% if 'mantener_peso' in objetivos %}checked{% endif %}>
+                        <label class="form-check-label" for="obj3">Mantener peso</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" type="checkbox" name="objetivos" value="mejorar_digestion" id="obj4" {% if 'mejorar_digestion' in objetivos %}checked{% endif %}>
+                        <label class="form-check-label" for="obj4">Mejorar digestión</label>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input class="form-check-input" type="checkbox" name="objetivos" value="control_condicion" id="obj5" {% if 'control_condicion' in objetivos %}checked{% endif %}>
+                        <label class="form-check-label" for="obj5">Controlar una condición (diabetes, hipertensión)</label>
                     </div>
 
+                    <hr>
+                    <h5>Preferencias y restricciones</h5>
                     <div class="mb-3">
-                        <label class="form-label">Contraseña:</label>
-                        <input class="form-control" type="password" name="contraseña" required>
+                        <label class="form-label">Alergias (coma-separadas):</label>
+                        <input class="form-control" type="text" name="alergias" value="{{ alergias or '' }}" placeholder="ej: maní, mariscos">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Intolerancias (coma-separadas):</label>
+                        <input class="form-control" type="text" name="intolerancias" value="{{ intolerancias or '' }}" placeholder="ej: lactosa, gluten">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Dieta específica (ej: vegana, keto):</label>
+                        <input class="form-control" type="text" name="dieta_especifica" value="{{ dieta_especifica or '' }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Alimentos que no te gustan:</label>
+                        <input class="form-control" type="text" name="alimentos_no_gustan" value="{{ alimentos_no_gustan or '' }}">
                     </div>
 
+                    <hr>
+                    <h5>Nivel de experiencia en cocina</h5>
+                    <div class="mb-3">
+                        <select class="form-select" name="experiencia" required>
+                            <option value="principiante" {% if experiencia == 'principiante' %}selected{% endif %}>Principiante</option>
+                            <option value="aficionado" {% if experiencia == 'aficionado' %}selected{% endif %}>Chef aficionado</option>
+                            <option value="experto" {% if experiencia == 'experto' %}selected{% endif %}>Experto</option>
+                        </select>
+                    </div>
+
+                    <!-- Botones -->
                     <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
                         <button class="btn btn-primary btn-lg" type="submit">📊 Calcular resultados</button>
                         <button class="btn btn-secondary btn-lg" type="reset">🔄 Limpiar</button>
@@ -70,22 +138,20 @@
                     </div>
                 </form>
 
+                <!-- Mostrar resultados IMC si están disponibles -->
                 {% if imc %}
-                <hr class="my-4">
-                <section>
-                    <h3 class="brand mb-3">📈 Resultados nutricionales</h3>
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <p><strong>IMC:</strong> <span class="badge bg-primary">{{ imc }}</span></p>
-                        </div>
-                        <div class="col-md-6 mb-2">
-                            <p><strong>Clasificación:</strong> <span class="badge bg-success">{{ clasificacion }}</span></p>
-                        </div>
+                    <hr>
+                    <h3 class="brand mt-4">📊 Resultados</h3>
+                    <div class="alert alert-info" role="alert">
+                        <p><strong>IMC:</strong> {{ imc }}</p>
+                        <p><strong>Clasificación:</strong> <span class="accent">{{ clasificacion }}</span></p>
+                        <p><strong>Recomendación:</strong> {{ recomendacion }}</p>
+                        <p><strong>Calorías estimadas (mantenimiento):</strong> {{ calorias }} kcal/día</p>
                     </div>
-                    <p><strong>Recomendación:</strong> {{ recomendacion }}</p>
-                    <p><strong>Calorías diarias estimadas:</strong> <span class="badge bg-warning text-dark">{{ calorias }} kcal</span></p>
-                    <a class="btn btn-success mt-3" href="{{ url_for('rutina') }}">Ver rutina personalizada →</a>
-                </section>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-success btn-lg" href="{{ url_for('rutina') }}">✅ Ver mi rutina personalizada</a>
+                        <a class="btn btn-outline-secondary btn-lg" href="{{ url_for('perfil') }}">👤 Ver mi perfil</a>
+                    </div>
                 {% endif %}
             </div>
         </div>
