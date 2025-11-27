@@ -16,8 +16,16 @@
     <h4 class="mt-3">Recursos descargables (simulados)</h4>
     <p>Puedes descargar plantillas y planillas en formato .txt desde aquí (simples enlaces locales).</p>
     <div class="d-flex gap-2">
-        <a class="btn btn-outline-primary" href="#">Plantilla ejercicios básicos (descarga)</a>
-        <a class="btn btn-outline-secondary" href="#">Planilla meal-prep (descarga)</a>
+        {% load static %}
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-primary" href="{% static '.txt' %}" download>
+                Plantilla ejercicios básicos (descarga)
+            </a>
+            <a class="btn btn-outline-secondary" href="{% static '.txt' %}" download>
+                Planilla meal-prep (descarga)
+            </a>
+        </div>
+        
     </div>
 </div>
 {% endblock %}
